@@ -4,18 +4,25 @@
 
 <div class="relative h-screen flex m-12 justify-center items-center overflow-hidden">
     <div class="upload max-w-3xl w-full bg-white p-10 rounded-lg shadow-lg shadow-gray-500 relative">
-        <button onclick="window.history.back();" class="back absolute top-4 right-4 bg-red-500 text-white p-2 rounded-lg">
+        <button onclick="window.history.back();" class="back absolute top-4 right-4 mt-3 bg-red-500 text-white p-2 rounded-lg">
             <span class="hidden sm:inline">BACK</span> <!-- Show 'BACK' on medium and larger screens -->
             <span class="sm:hidden bg:">✖</span> <!-- Show '✖' on small screens -->
         </button>
         
         @php
             $documentLabels = [
-                'cor' => 'Certificate of Registration',
-                'medical_records' => 'Medical Records',
-                'birth_certificate' => 'Birth Certificate',
-                'assurance' => 'Assurance',
-                'company_paper' => 'Company Paper'
+                     'cor' => 'Certificate of Registration',
+                    'medical' => 'Medical Certificate',
+                    'psa' => 'Birth Certificate', 
+                    'insurance' => 'Health Insurance',
+                    'consent' => 'Parent Consent',
+                    'waiver' => 'Waiver',
+                    'mdr' => 'Member Data Record',
+                    'resume' => 'Resume',
+                    'bio_data' => 'Bio Data',
+                    'letter' => 'Application Letter',
+                    'clearance' => 'Police Clearance',
+                    'philhealth' => 'PhilHealth ID',
             ];
 
             $formattedType = isset($type) && is_string($type) ? ($documentLabels[$type] ?? ucwords(str_replace('_', ' ', $type))) : 'Unknown Document';

@@ -5,8 +5,8 @@
 <div class="container mx-auto px-6 py-8 min-h-screen overflow-auto mb-10">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
         @foreach ([
-            'cor', 'medical_records', 'birth_certificate', 'assurance', 'company_paper',
-            'passport', 'transcript', 'resume', 'id_card', 'recommendation_letter'
+            'cor', 'medical', 'psa', 'insurance', 'consent', 
+            'waiver', 'mdr', 'resume', 'bio_data', 'letter', 'clearance', 'philhealth',
         ] as $type)
         
             @php
@@ -15,10 +15,17 @@
                     ->first();
                 $documentLabels = [
                     'cor' => 'Certificate of Registration',
-                    'medical_records' => 'Medical Records',
-                    'birth_certificate' => 'Birth Certificate', 
-                    'assurance' => 'Assurance',
-                    'company_paper' => 'Company Paper'
+                    'medical' => 'Medical Certificate',
+                    'psa' => 'Birth Certificate', 
+                    'insurance' => 'Health Insurance',
+                    'consent' => 'Parent Consent',
+                    'waiver' => 'Waiver',
+                    'mdr' => 'Member Data Record',
+                    'resume' => 'Resume',
+                    'bio_data' => 'Bio Data',
+                    'letter' => 'Application Letter',
+                    'clearance' => 'Police Clearance',
+                    'philhealth' => 'PhilHealth ID',
                 ];
                 $formattedType = $documentLabels[$type] ?? ucwords(str_replace('_', ' ', $type));
             @endphp

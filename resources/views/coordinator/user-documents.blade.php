@@ -15,22 +15,25 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-20">
 
         @foreach ([
-            'cor', 'medical_records', 'birth_certificate', 'assurance', 'company_paper', 
-            'passport', 'transcript', 'resume', 'id_card', 'recommendation_letter'
+            'cor', 'medical', 'psa', 'insurance', 'consent', 
+            'waiver', 'mdr', 'resume', 'bio_data', 'letter', 'clearance', 'philhealth',
         ] as $type)
             @php
                 $document = $user->documents->where('document_type', $type)->first();
                 $documentLabels = [
                     'cor' => 'Certificate of Registration',
-                    'medical_records' => 'Medical Records',
-                    'birth_certificate' => 'Birth Certificate', 
-                    'assurance' => 'Assurance',
-                    'company_paper' => 'Company Paper',
-                    'passport' => 'Passport',
-                    'transcript' => 'Transcript',
+                    'medical' => 'Medical Certificate',
+                    'psa' => 'Birth Certificate', 
+                    'insurance' => 'Health Insurance',
+                    'consent' => 'Parent Consent',
+                    'waiver' => 'Waiver',
+                    'mdr' => 'Member Data Record',
                     'resume' => 'Resume',
-                    'id_card' => 'ID Card',
-                    'recommendation_letter' => 'Recommendation Letter'
+                    'bio_data' => 'Bio Data',
+                    'letter' => 'Application Letter',
+                    'clearance' => 'Police Clearance',
+                    'philhealth' => 'PhilHealth ID',
+        
                 ]; 
                 $formattedType = $documentLabels[$type] ?? ucwords(str_replace('_', ' ', $type));
             @endphp

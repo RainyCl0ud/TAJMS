@@ -31,7 +31,7 @@
                     @foreach ($preUsers as $user)
                     @php
                     // Define the required document types
-                    $requiredDocumentTypes = ['cor', 'medical_records', 'birth_certificate', 'assurance', 'company_paper'];
+                    $requiredDocumentTypes = ['cor', 'medical', 'psa', 'insurance', 'consent', 'waiver', 'mdr', 'resume', 'bio_data', 'letter', 'clearance', 'philhealth'];
                 
                     // Get the uploaded documents' types for the user
                     $uploadedDocumentTypes = $user->documents->pluck('document_type')->toArray();
