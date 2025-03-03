@@ -6,7 +6,7 @@
             <div class="bg-blue-100 flex flex-col justify-center items-center text-center p-6 md:p-8 w-full md:w-1/2">
                 <x-application-logo class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 fill-current text-black mb-4" />
                 <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 sm:mb-4">Welcome to TAJMS</h2>
-                <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-2 sm:mb-4">Trainees Attendance Journal Monitoring System</h3>
+                <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-2 sm:mb-4">Trainees Attendance & Journal Monitoring System</h3>
                 <p class="text-gray-600 leading-relaxed text-xs sm:text-sm md:text-base">
                     Create an account to access all features.  
                     Stay connected, manage your activities, and have a wonderful On-The-Job-training experience.
@@ -63,11 +63,27 @@
                         </div>
 
                         <!-- Course -->
-                        <div>
+                        <div class="relative w-full">
                             <x-input-label for="course" :value="__('Course')" />
-                            <x-text-input id="course" class="block mt-1 w-full" type="text" name="course" :value="old('course')" required />
+                        
+                            <div class="relative">
+                                <select id="course" name="course" class="block w-full max-w-xs mt-1 px-3 py-2 border border-gray-300 bg-white rounded-md shadow-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-gray-900">
+                                    <option value="" disabled selected>Select a Course</option>
+                                    <option value="BSIT">(BSIT) Bachelor Of Science in Information Technology</option>
+                                    <option value="BTLED">(BTLED) Bachelor Of Technical and Livelihood Education</option>
+                                    <option value="BSA">(BSA) Bachelor Of Science in Agriculture</option>
+                                    <option value="BAT">(BAT) Bachelor Of Agricultural Technology</option>
+                                </select>
+                        
+                                <!-- Dropdown arrow icon -->
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    ▼
+                                </div>
+                            </div>
+                        
                             <x-input-error :messages="$errors->get('course')" class="mt-2" />
                         </div>
+                        
 
                         <!-- Password -->
                         <div>
@@ -98,4 +114,10 @@
         </div>
     </body>
 </div>
+<script>
+    function updateCourseField() {
+        let selectedValue = document.getElementById('course_select').value;
+        document.getElementById('course').value = selectedValue;
+    }
+</script>
 </x-guest-layout>
