@@ -1,0 +1,217 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body, html {
+  height: 100%;
+  overflow: hidden;
+}
+
+
+
+#clock {
+  text-align: center;
+  font-size: 2rem;
+  padding-left: 10px;
+  height: 50px;
+}
+
+.date {
+  font-weight: bold;
+  margin-left: -450px;
+}
+
+.PI {
+  width: 970px;
+}
+
+.upload {
+  margin-bottom: 200px;
+}
+
+tr:active {
+  background-color: #f3f4f6;
+}
+
+/* Buttons */
+#captureButton {
+  border-radius: 50px;
+}
+
+#save-profile-button {
+  display: inline-block !important;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#save-profile-button[style*="display: inline-block"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+#save-profile-button[style*="display: none"] {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+  gap: 1.5rem;
+}
+
+.gridX {
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 1.5rem; 
+}
+
+.double-width {
+  flex: 1 1 100%; 
+  width: auto; 
+}
+
+.rounded-full {
+  border-radius: 50%;
+}
+
+/* Attendance Section */
+.attendanceB {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 0.375rem;
+  max-width: 550px; 
+  height: 320px; 
+  overflow: hidden;
+}
+
+.attendanceB h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.attendanceB table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.attendanceB th,
+.attendanceB td {
+  padding: 0.75rem;
+  border: 1px solid #00000034;
+  text-align: left;
+}
+
+.attendanceB th {
+  background-color: #f9fafb;
+  color: #4b5563;
+}
+
+/* Remove max-height and overflow to prevent scrolling */
+.attendanceB tbody {
+  max-height: 300px; 
+  overflow-y: auto;
+  display: block;
+}
+
+.attendanceB thead,
+.attendanceB tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.attendanceB p.text-gray-500 {
+  margin-top: 20px; 
+  text-align: center; 
+}
+
+/* Journal Section */
+.journalB {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 0.375rem;
+  max-width: 400px; 
+  height: 320px; 
+  overflow: hidden; 
+}
+
+.journalB h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.journalB table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.journalB th,
+.journalB td {
+  padding: 0.75rem;
+  border: 1px solid #00000034;
+  text-align: left;
+}
+
+.journalB th {
+  background-color: #f9fafb;
+  color: #4b5563;
+}
+
+.journalB tbody {
+  max-height: 300px; 
+  overflow-y: auto;
+  display: block;
+}
+
+.journalB thead,
+.journalB tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.journalB tbody tr:hover {
+  background-color: #f3f4f6;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.journalB p.text-gray-500 {
+  margin-top: 20px; 
+  text-align: center; 
+}
+
+.pass-form {
+  padding-bottom: 30px;
+  padding-left: 20px;
+}
+
+.cont {
+  height: 26rem;
+}
+
+.rec {
+  height: 130px;
+  color: black;
+}
+
+.sideB:hover {
+  background-color: hsla(209, 96%, 44%, 0.438);
+}
+
+.overV {
+  color: rgba(0, 0, 0, 0.452);
+  font-size: 13px;
+}
+
+.trainee-info {
+  background-color: #FCFCFD;
+  box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px, rgba(45, 35, 66, 0.3) 1px 7px 13px -10px, #D6D6E7 0 -3px 0 inset;
+  border-radius: 4px;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+thead {
+  pointer-events: none;
+}
