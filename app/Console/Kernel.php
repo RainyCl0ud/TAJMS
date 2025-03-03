@@ -12,8 +12,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('app:mark-absent-users')->dailyAt('00:05'); // Runs every day at 12:05 AM
+        $schedule->command('attendance:mark-absent')->everyMinute();
     }
+    
+
 
     /**
      * Register the commands for the application.
