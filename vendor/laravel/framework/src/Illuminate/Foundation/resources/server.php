@@ -7,7 +7,7 @@ $uri = urldecode(
 );
 
 // Ensure Laravel uses the correct port
-$port = getenv('PORT') ?: 8000;
+$port = getenv('PORT') ?: 9000;
 
 // This file allows us to emulate Apache's "mod_rewrite" functionality from the
 // built-in PHP web server. This provides a convenient way to test a Laravel
