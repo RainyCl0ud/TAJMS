@@ -1,16 +1,11 @@
-[pkgs]
-packages = ["php", "php-fpm", "nginx"]
-
-[phases.setup]
-nixPkgsArchive = "https://nixos.org/channels/nixos-23.05"
-
 [phases.build]
 cmds = [
-    "composer install --no-dev --optimize-autoloader"
+  "composer install --no-dev --optimize-autoloader",
+  "cp php-fpm.conf /etc/php-fpm.conf"
 ]
 
 [phases.start]
 cmds = [
-    "php-fpm --nodaemonize --fpm-config /etc/php-fpm.conf &",
-    "nginx -g 'daemon off;'"
+  "php-fpm --nodaemonize --fpm-config /etc/php-fpm.conf &",
+  "nginx -g 'daemon off;'"
 ]
