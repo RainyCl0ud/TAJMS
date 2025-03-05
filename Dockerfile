@@ -20,6 +20,7 @@ COPY . .
 
 # Install Laravel dependencies
 RUN composer install --no-dev --optimize-autoloader
-RUN chmod -R 777 storage bootstrap/cache
+RUN mkdir -p storage bootstrap/cache && chmod -R 777 storage bootstrap/cache
+
 
 CMD ["php-fpm"]
