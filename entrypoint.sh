@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# Set correct permissions for storage and cache
+# Set correct permissions
 chmod -R 777 /app/storage /app/bootstrap/cache
 
-# Start PHP-FPM in the background
-php-fpm -D
+# Start PHP-FPM in the foreground
+php-fpm &
 
-# Start Nginx in the foreground (so Railway doesn't stop it)
+# Start Nginx in the foreground
 nginx -g "daemon off;"
