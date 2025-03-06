@@ -30,7 +30,7 @@ RUN mkdir -p storage bootstrap/cache && chmod -R 777 storage bootstrap/cache
 COPY nginx.conf /etc/nginx/sites-available/default
 
 # Expose ports
-EXPOSE 9000
+EXPOSE 80
 
 # Start both PHP-FPM & Nginx
 CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
