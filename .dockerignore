@@ -1,7 +1,0 @@
-node_modules
-vendor
-storage
-.git
-.env
-docker-compose.yml
-Dockerfile
