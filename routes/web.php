@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JournalController;
-use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PreUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RequestController;
@@ -11,7 +10,7 @@ use App\Http\Controllers\TraineeController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CoordinatorController;
-use App\Http\Controllers\ConversationController;
+
 
 // Public Route
 Route::get('/', function () {
@@ -99,13 +98,6 @@ Route::middleware('auth')->group(function () {
      Route::get('/absents', [RequestController::class, 'showAbsentRequests'])->name('absents.index');
 
      Route::delete('/request/{id}', [RequestController::class, 'delete'])->name('requests.delete');
-
-     
-
-
-    
-   
-
 
 
 });
