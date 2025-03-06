@@ -33,4 +33,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 
 # Start both PHP-FPM & Nginx
-CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
+RUN apt-get update && apt-get install -y supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+
