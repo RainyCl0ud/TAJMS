@@ -29,17 +29,24 @@ RUN mkdir -p storage bootstrap/cache && chmod -R 777 storage bootstrap/cache
 # Copy Nginx configuration
 COPY default.conf /etc/nginx/conf.d/default.conf
 
-# Remove any existing default Nginx configuration
-RUN rm -f /etc/nginx/conf.d/default.conf
-
-# Expose ports
-EXPOSE 80
-
 # Install Supervisor to manage processes
 RUN apt-get update && apt-get install -y supervisor
 
 # Copy Supervisor configuration
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+# Remove any existing default Nginx configuration
+RUN rm -f /etc/nginx/conf.d/default.conf
+
+# Remove the default Nginx http block
+RUN rm -rf /etc/nginx/sites-enabled/default
+
+# Copy the custom Nginx configuration file
+COPY default.conf /etc/nginx/conf.d/default.conf
+
+RUN service nginx restart
+
+# Expose ports
+EXPOSE 80
 # Start both PHP-FPM & Nginx
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
