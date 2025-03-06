@@ -36,7 +36,7 @@ RUN apt-get update && apt-get install -y supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Remove any existing default Nginx configuration
-RUN rm -f /etc/nginx/conf.d/default.conf
+COPY default.conf /etc/nginx/conf.d/default.conf
 
 # Remove the default Nginx http block
 RUN rm -rf /etc/nginx/sites-enabled/default
