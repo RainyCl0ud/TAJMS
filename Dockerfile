@@ -27,7 +27,7 @@ RUN composer install --no-dev --optimize-autoloader
 RUN mkdir -p storage bootstrap/cache && chmod -R 777 storage bootstrap/cache
 
 # Copy Nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY default.conf /etc/nginx/conf.d/default.conf
 
 # Expose ports
 EXPOSE 80
