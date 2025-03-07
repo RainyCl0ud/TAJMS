@@ -1,7 +1,10 @@
+db_data/mysql.sock
+public/storage
 node_modules
 vendor
-storage
 .git
 .env
-docker-compose.yml
-Dockerfile
+storage/logs
+storage/framework/cache
+storage/framework/views
+storage/framework/sessions

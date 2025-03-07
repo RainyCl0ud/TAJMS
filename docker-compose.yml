@@ -9,7 +9,7 @@ services:
     expose:
       - "80"
     ports:
-      - "8009:80"  # Expose Nginx inside this container
+      - "8009:80"  
     depends_on:
       - db
     networks:

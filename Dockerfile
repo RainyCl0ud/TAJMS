@@ -44,8 +44,7 @@ RUN rm -rf /etc/nginx/sites-enabled/default
 # Copy the custom Nginx configuration file
 COPY default.conf /etc/nginx/conf.d/default.conf
 
-
-RUN nginx -t && nginx -s reload
+RUN nginx -t
 
 # Expose ports
 EXPOSE 80
