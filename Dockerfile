@@ -49,4 +49,7 @@ RUN nginx -t
 # Expose ports
 EXPOSE 80
 # Start both PHP-FPM & Nginx
+
+COPY supervisord.conf /etc/supervisor/supervisord.conf
+
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
