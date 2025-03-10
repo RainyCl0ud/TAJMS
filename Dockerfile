@@ -31,9 +31,5 @@ RUN apt-get update && apt-get install -y supervisor
 # Copy Supervisor configuration
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Expose PHP-FPM port
-EXPOSE 9000
-
 # Start PHP-FPM via php artisan serve
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=80"]
-
