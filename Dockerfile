@@ -1,9 +1,8 @@
 # Use PHP 8.2 with FPM
 FROM php:8.2-fpm
 
-# Install dependencies (including Nginx)
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-    nginx \
     libpng-dev \
     zip \
     unzip \
@@ -26,30 +25,14 @@ RUN composer install --no-dev --optimize-autoloader
 # Set permissions for storage & cache
 RUN mkdir -p storage bootstrap/cache && chmod -R 777 storage bootstrap/cache
 
-# Copy Nginx configuration
-COPY default.conf /etc/nginx/conf.d/default.conf
-
 # Install Supervisor to manage processes
 RUN apt-get update && apt-get install -y supervisor
 
 # Copy Supervisor configuration
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Remove any existing default Nginx configuration
-COPY default.conf /etc/nginx/conf.d/default.conf
+# Expose PHP-FPM port
+EXPOSE 9000
 
-# Remove the default Nginx http block
-RUN rm -rf /etc/nginx/sites-enabled/default
-
-# Copy the custom Nginx configuration file
-COPY default.conf /etc/nginx/conf.d/default.conf
-
-RUN nginx -t
-
-# Expose ports
-EXPOSE 80
-# Start both PHP-FPM & Nginx
-
-COPY supervisord.conf /etc/supervisor/supervisord.conf
-
+# Start PHP-FPM via Supervisor
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

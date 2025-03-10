@@ -7,9 +7,7 @@ services:
     volumes:
       - .:/var/www
     expose:
-      - "80"
-    ports:
-      - "8009:80"  
+      - "9000"  # Expose PHP-FPM port
     depends_on:
       - db
     networks:
