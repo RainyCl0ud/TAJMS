@@ -436,3 +436,37 @@
 2025-03-07 11:23:03,122 INFO waiting for nginx, php-fpm to die
 2025-03-07 11:23:04,480 INFO stopped: php-fpm (exit status 0)
 2025-03-07 11:23:05,562 INFO stopped: nginx (exit status 0)
+2025-03-10 02:50:27,651 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2025-03-10 02:50:27,663 INFO supervisord started with pid 1
+2025-03-10 02:50:28,673 INFO spawned: 'php-fpm' with pid 7
+2025-03-10 02:50:29,728 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-03-10 02:50:29,753 WARN exited: php-fpm (exit status 78; not expected)
+2025-03-10 02:50:30,764 INFO spawned: 'php-fpm' with pid 8
+2025-03-10 02:50:30,928 WARN exited: php-fpm (exit status 78; not expected)
+2025-03-10 02:50:31,933 INFO spawned: 'php-fpm' with pid 9
+2025-03-10 02:50:32,182 WARN exited: php-fpm (exit status 78; not expected)
+2025-03-10 02:50:34,199 INFO spawned: 'php-fpm' with pid 10
+2025-03-10 02:50:34,331 WARN exited: php-fpm (exit status 78; not expected)
+2025-03-10 02:50:37,339 INFO spawned: 'php-fpm' with pid 11
+2025-03-10 02:50:37,640 WARN exited: php-fpm (exit status 78; not expected)
+2025-03-10 02:50:38,643 INFO gave up: php-fpm entered FATAL state, too many start retries too quickly
+2025-03-10 03:02:49,563 INFO reaped unknown pid 20 (terminated by SIGHUP)
+2025-03-10 03:02:49,613 INFO reaped unknown pid 21 (terminated by SIGHUP)
+2025-03-10 03:02:49,615 INFO reaped unknown pid 22 (terminated by SIGHUP)
+2025-03-10 03:02:49,616 INFO reaped unknown pid 23 (terminated by SIGHUP)
+2025-03-10 03:02:49,617 INFO reaped unknown pid 24 (terminated by SIGHUP)
+2025-03-10 03:37:24,001 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2025-03-10 03:37:24,032 INFO supervisord started with pid 1
+2025-03-10 03:37:25,039 INFO spawned: 'php-fpm' with pid 7
+2025-03-10 03:37:26,045 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-03-10 03:37:29,134 WARN exited: php-fpm (exit status 78; not expected)
+2025-03-10 03:37:30,155 INFO spawned: 'php-fpm' with pid 8
+2025-03-10 03:37:30,649 WARN exited: php-fpm (exit status 78; not expected)
+2025-03-10 03:37:31,733 INFO spawned: 'php-fpm' with pid 9
+2025-03-10 03:37:32,281 WARN exited: php-fpm (exit status 78; not expected)
+2025-03-10 03:37:34,299 INFO spawned: 'php-fpm' with pid 10
+2025-03-10 03:37:34,641 WARN exited: php-fpm (exit status 78; not expected)
+2025-03-10 03:37:37,803 INFO spawned: 'php-fpm' with pid 11
+2025-03-10 03:37:38,138 WARN exited: php-fpm (exit status 78; not expected)
+2025-03-10 03:37:39,141 INFO gave up: php-fpm entered FATAL state, too many start retries too quickly
+2025-03-10 03:54:33,407 WARN received SIGQUIT indicating exit request

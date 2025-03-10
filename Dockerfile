@@ -34,5 +34,6 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Expose PHP-FPM port
 EXPOSE 9000
 
-# Start PHP-FPM via Supervisor
-CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Start PHP-FPM via php artisan serve
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=80"]
+

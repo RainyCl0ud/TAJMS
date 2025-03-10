@@ -7,7 +7,9 @@ services:
     volumes:
       - .:/var/www
     expose:
-      - "9000"  # Expose PHP-FPM port
+      - "80" 
+    ports:
+      - "8009:80"  # Forward container's port 80 to host's 8009
     depends_on:
       - db
     networks:
