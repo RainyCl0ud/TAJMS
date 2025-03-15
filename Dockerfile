@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     nodejs \
-    npm
+    npm \
+    nginx
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -31,11 +32,27 @@ COPY . /var/www/
 RUN composer install --optimize-autoloader --no-dev
 RUN npm install && npm run build
 
+# Configure Nginx
+COPY docker/nginx/default.conf /etc/nginx/sites-available/default
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 # Expose port
 EXPOSE 8000
 
-# Set start command
-CMD ["bash", "start.sh"]
+# Create start script
+RUN echo '#!/bin/bash\n\
+php artisan migrate --force\n\
+php artisan storage:link\n\
+php artisan config:cache\n\
+php artisan route:cache\n\
+php artisan view:cache\n\
+service nginx start\n\
+php-fpm\n' > /var/www/docker-entrypoint.sh \
+&& chmod +x /var/www/docker-entrypoint.sh
+
+# Start script
+CMD ["/var/www/docker-entrypoint.sh"]
