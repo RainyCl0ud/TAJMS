@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        if(config('app.env') === 'production') {
+            \URL::forceScheme('https');
+        }
+        
         view()->composer('components.header', function ($view) {
             $view->with('pageTitle', $view->getData()['pageTitle'] ?? 'Dashboard');
         });
