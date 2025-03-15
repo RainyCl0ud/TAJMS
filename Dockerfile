@@ -41,7 +41,7 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 # Expose port
-EXPOSE 8000
+EXPOSE 8080
 
 # Create start script
 RUN echo '#!/bin/bash\n\
