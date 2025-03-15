@@ -1,9 +1,15 @@
-#!/bin/sh
-# Install PHP and PHP-FPM
-apk add --no-cache php81 php81-fpm
+#!/bin/bash
 
-# Start PHP-FPM
-php-fpm81 -D
+# Run migrations
+php artisan migrate --force
 
-# Start Laravel
+# Link storage
+php artisan storage:link
+
+# Cache configuration
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Start the server
 php artisan serve --host=0.0.0.0 --port=$PORT
