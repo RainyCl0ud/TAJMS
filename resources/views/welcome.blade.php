@@ -30,7 +30,7 @@
         </h1>
         
         <p class="mt-4 text-gray-700 text-base sm:text-lg md:text-xl leading-relaxed animate-slideIn">
-            <span class="text-blue-800 font-semibold">TAJMS</span> (Time and Attendance Job Management System) helps you manage work schedules, track attendance, and streamline your workflow efficiently.
+            <span class="text-blue-800 font-semibold">TAJMS</span> (Trainees Attendance & Journal Monitoring System) helps you manage work schedules, track attendance, and streamline your workflow efficiently.
         </p>
 
         <!-- Authentication Buttons -->
