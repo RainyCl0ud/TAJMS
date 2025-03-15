@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'https://tajms-production-93d1.up.railway.app'),
 
     /*
     |--------------------------------------------------------------------------
