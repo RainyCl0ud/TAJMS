@@ -61,9 +61,9 @@ Route::middleware('auth')->group(function () {
     });
 
     // Journal routes
+    Route::patch('/journal/update/{id}', [JournalController::class, 'update'])->name('journal.update');
     Route::get('/journal/preview-pdf', [JournalController::class, 'previewPdf'])->name('journal.preview-pdf');
     Route::resource('journal', JournalController::class);
-    Route::patch('/journal/update/{id}', [JournalController::class, 'update'])->name('journal.update');
     Route::get('/journal/{journal}', [JournalController::class, 'show'])->name('journal.show');
     
 
