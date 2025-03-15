@@ -63,8 +63,9 @@ Route::middleware('auth')->group(function () {
     // Journal routes
     Route::get('/journal/preview-pdf', [JournalController::class, 'previewPdf'])->name('journal.preview-pdf');
     Route::resource('journal', JournalController::class);
-    Route::get('/journal/{journal}', [JournalController::class, 'show'])->name('journal.show');
     Route::patch('/journal/update/{id}', [JournalController::class, 'update'])->name('journal.update');
+    Route::get('/journal/{journal}', [JournalController::class, 'show'])->name('journal.show');
+    
 
     
     // Attendance routes
