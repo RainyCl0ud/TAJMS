@@ -46,6 +46,7 @@ EXPOSE 9000
 # Create start script
 RUN echo '#!/bin/bash\n\
 php artisan migrate --force\n\
+php artisan storage:link\n\
 service nginx start\n\
 php-fpm\n' > /var/www/docker-entrypoint.sh \
 && chmod +x /var/www/docker-entrypoint.sh
