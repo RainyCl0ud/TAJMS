@@ -22,10 +22,11 @@
                             <span class="text-sm">{{ ucfirst(Auth::user()->first_name . ' ' . Auth::user()->last_name) }}</span>
                             <span class="block text-xs text-gray-500">{{ Auth::user()->role }}</span>
                         </div>
-                        <img src="{{ Auth::user()->profile_picture && file_exists(storage_path('app/public/' . Auth::user()->profile_picture)) 
-                                    ? asset('storage/' . Auth::user()->profile_picture) 
-                                    : asset('images/profile_empty.png') }}"  
-                             alt="Profile picture" class="h-10 w-10 rounded-full ml-2 object-cover cursor-pointer border border-black hover:shadow-lg hover:shadow-blue-300">
+                        <img src="{{ Auth::user()->profile_picture 
+                        ? asset('storage/' . Auth::user()->profile_picture) 
+                        : asset('images/profile_empty.png') }}"  
+                 alt="Profile picture" class="h-10 w-10 rounded-full ml-2 object-cover cursor-pointer border border-black hover:shadow-lg hover:shadow-blue-300">
+            
                     </div>
                 @endif
             </x-slot>
