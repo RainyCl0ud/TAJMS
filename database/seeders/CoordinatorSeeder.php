@@ -28,7 +28,7 @@ class CoordinatorSeeder extends Seeder
             'user_id' => $user->id,
             'employee_id' => '12345', // You can change this as needed
             'contact_number' => '123-456-7890', // Adjust the contact number
-            'course' => 'BSIT', // Adjust the course if needed
+            'course' => 'BAT', // Adjust the course if needed
         ]);
     }
 }
