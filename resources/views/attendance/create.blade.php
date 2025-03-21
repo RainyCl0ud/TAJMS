@@ -131,6 +131,7 @@
     }
     </script>
 
-    <script src="{{ mix('js/attendance.js') }}"></script>
+ @vite('resources/js/attendance.js')
+
 </div>
 @endsection
