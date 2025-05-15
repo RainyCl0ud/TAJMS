@@ -18,11 +18,20 @@ class GoogleDriveService
         
         // Handle credentials from environment variable
         if (env('GOOGLE_APPLICATION_CREDENTIALS_JSON')) {
-            // Create a temporary file with the credentials
-            $tempFile = tempnam(sys_get_temp_dir(), 'google_credentials_');
-            file_put_contents($tempFile, env('GOOGLE_APPLICATION_CREDENTIALS_JSON'));
-            $this->client->setAuthConfig($tempFile);
-            unlink($tempFile); // Clean up the temporary file
+            try {
+                // Decode and validate the JSON credentials
+                $credentials = json_decode(env('GOOGLE_APPLICATION_CREDENTIALS_JSON'), true, 512, JSON_THROW_ON_ERROR);
+                
+                // Create a temporary file with the properly formatted credentials
+                $tempFile = tempnam(sys_get_temp_dir(), 'google_credentials_');
+                file_put_contents($tempFile, json_encode($credentials, JSON_PRETTY_PRINT));
+                
+                $this->client->setAuthConfig($tempFile);
+                unlink($tempFile); // Clean up the temporary file
+            } catch (\Exception $e) {
+                logger()->error('Failed to parse Google credentials: ' . $e->getMessage());
+                throw new \RuntimeException('Invalid Google credentials configuration');
+            }
         } else {
             // Fallback to file-based credentials
             $this->client->setAuthConfig(storage_path('keys/laravel-image-storage-c0626205a852.json'));
@@ -45,6 +54,11 @@ class GoogleDriveService
             logger()->info('Google Drive service account connection verified successfully');
         } catch (\Exception $e) {
             logger()->error('Google Drive service account verification failed: ' . $e->getMessage());
+            logger()->error('Full error details: ' . json_encode([
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'trace' => $e->getTraceAsString()
+            ]));
             throw new \RuntimeException('Failed to initialize Google Drive service: ' . $e->getMessage());
         }
     }
