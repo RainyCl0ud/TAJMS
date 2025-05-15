@@ -67,9 +67,22 @@
                     $images = json_decode($journal->image, true);
                 @endphp
                 <div class="images">
-                    @foreach($images as $image)
-                        <img src="{{ public_path('storage/' . $image) }}" alt="Journal Image">
-                    @endforeach
+                @foreach($images as $image)
+    @php
+        $imagePath = public_path('storage/' . $image);
+        if (file_exists($imagePath)) {
+            $imageData = base64_encode(file_get_contents($imagePath));
+            $mimeType = mime_content_type($imagePath);
+        }
+    @endphp
+
+    @if (!empty($imageData))
+        <img src="data:{{ $mimeType }};base64,{{ $imageData }}" alt="Journal Image">
+    @else
+        <p style="color:red;">Image not found: {{ $image }}</p>
+    @endif
+@endforeach
+
                 </div>
             @endif
         </div>
