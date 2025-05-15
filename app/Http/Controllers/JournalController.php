@@ -134,58 +134,57 @@ class JournalController extends Controller
 
     
     public function previewPdf()
-    {
-        try {
-            $user = Auth::user();
-    
-            $journals = Journal::where('user_id', $user->id)
-                ->orderBy('created_at', 'asc')
-                ->get();
-    
-            foreach ($journals as $journal) {
-                $journal->base64Images = [];
-                
-                if ($journal->image) {
-                    $images = json_decode($journal->image, true);
-                    if (is_array($images)) {
-                        foreach ($images as $imageUrl) {
-                            $ch = curl_init();
-                            curl_setopt($ch, CURLOPT_URL, $imageUrl);
-                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                            curl_setopt($ch, CURLOPT_HEADER, false);
-                            
-                            $response = curl_exec($ch);
-                            $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-                            $body = substr($response, $headerSize);
-                            $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-                            
-                            curl_close($ch);
+{
+    try {
+        $user = Auth::user();
 
-                            if ($body) {
-                                $base64 = 'data:' . $contentType . ';base64,' . base64_encode($body);
-                                $journal->base64Images[] = $base64;
-                            }
-                        }
+        $journals = Journal::where('user_id', $user->id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        // Prepare journals with base64 images
+        foreach ($journals as $journal) {
+            if ($journal->image) {
+                $images = json_decode($journal->image, true);
+                $base64Images = [];
+
+                foreach ($images as $imageUrl) {
+                    // Download the image data from Google Drive
+                    $imageData = @file_get_contents($imageUrl);
+
+                    if ($imageData !== false) {
+                        $finfo = finfo_open();
+                        $mimeType = finfo_buffer($finfo, $imageData, FILEINFO_MIME_TYPE);
+                        finfo_close($finfo);
+
+                        // Encode image data as base64 string
+                        $base64 = 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
+                        $base64Images[] = $base64;
                     }
                 }
+
+                $journal->base64Images = $base64Images;
+            } else {
+                $journal->base64Images = [];
             }
-    
-            $pdf = Pdf::loadView('journal.pdf', compact('journals'))
-                ->setPaper('A4', 'portrait');
-    
-            return $pdf->stream('journal_report_' . $user->id . '.pdf');
-    
-        } catch (\Exception $e) {
-            Log::error('Journal PDF generation failed: ' . $e->getMessage());
-    
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to generate Journal PDF.',
-                'error' => $e->getMessage()
-            ], 500);
         }
+
+        $pdf = Pdf::loadView('journal.pdf', compact('journals'))
+            ->setPaper('A4', 'portrait');
+
+        return $pdf->stream('journal_report_' . $user->id . '.pdf');
+
+    } catch (\Exception $e) {
+        Log::error('Journal PDF generation failed: ' . $e->getMessage());
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to generate Journal PDF.',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
+
     
     }
 
