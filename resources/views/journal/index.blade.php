@@ -2,31 +2,40 @@
 @include('components.header')
 
 @section('content')
+@php
+    if (!function_exists('getDriveImageUrl')) {
+        function getDriveImageUrl($url) {
+            if (preg_match('/\/d\/(.*?)\//', $url, $matches)) {
+                return 'https://drive.google.com/uc?export=view&id=' . $matches[1];
+            } elseif (preg_match('/id=([^&]+)/', $url, $matches)) {
+                return 'https://drive.google.com/uc?export=view&id=' . $matches[1];
+            }
+            return $url;
+        }
+    }
+@endphp
+
 <div class="bg-blue-100 min-h-screen">
 <div class="w-full px-4 sm:px-6 md:px-10 mx-auto p-4 sm:p-6 md:p-10">
 
-   @if(session('success') || session('error'))
- <div id="flash-message" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-opacity-90 px-6 py-3 rounded-lg shadow-lg text-white text-lg font-semibold transition-opacity duration-500"
+@if(session('success') || session('error'))
+<div id="flash-message" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-opacity-90 px-6 py-3 rounded-lg shadow-lg text-white text-lg font-semibold transition-opacity duration-500"
      style="z-index: 9999; background-color: rgba(0, 0, 0, 0.8);">
      {{ session('success') ?? session('error') }}
- </div>
- @endif
-    
-    <div class="flex justify-between items-center mb-5">
-        <a href="{{ route('journal.create') }}" class="bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 transition duration-300 text-sm sm:text-base">
-            Create New Journal Entry
-        </a>
+</div>
+@endif
 
+<div class="flex justify-between items-center mb-5">
+    <a href="{{ route('journal.create') }}" class="bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 transition duration-300 text-sm sm:text-base">
+        Create New Journal Entry
+    </a>
+    <button onclick="previewPdf()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm sm:text-base">
+        Preview PDF
+    </button>
+</div>
 
-
-        <button onclick="previewPdf()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm sm:text-base">
-            Preview PDF
-        </button>
-
-    </div>
-
-   <!-- Journal Entries Table -->
-   <div class="overflow-hidden rounded-lg shadow-lg border border-black shadow-lg shadow-black">
+<!-- Journal Entries Table -->
+<div class="overflow-hidden rounded-lg shadow-lg border border-black shadow-lg shadow-black">
     <div class="max-h-[calc(100vh-20rem)] sm:max-h-[calc(100vh-15rem)] overflow-auto">
         <table class="w-full text-xs sm:text-sm md:text-base relative">
             <thead class="bg-gray-800 text-white sticky top-0 z-10">
@@ -46,60 +55,33 @@
                     </td>
                     <td class="px-2 sm:px-4 py-4 whitespace-nowrap">{{ $journal->created_at->format('Y-m-d') }}</td>
                     <td class="px-2 sm:px-4 py-4 whitespace-nowrap">
-
-
-
-                    @if($journal->image)
-    @php
-        $images = json_decode($journal->image, true);
-        $totalImages = count($images);
-        $displayImages = array_slice($images, 0, 3);
-    @endphp
-    <div class="relative flex items-center w-[70px] sm:w-[90px] h-10 sm:h-12 overflow-hidden">
-        @foreach($displayImages as $index => $image)
-        @php
-    function getDriveImageUrl($url) {
-        if (preg_match('/\/d\/(.*?)\//', $url, $matches)) {
-            return 'https://drive.google.com/uc?export=view&id=' . $matches[1];
-        } elseif (preg_match('/id=([^&]+)/', $url, $matches)) {
-            return 'https://drive.google.com/uc?export=view&id=' . $matches[1];
-        }
-        return $url;
-    }
-@endphp
-
-<img src="{{ getDriveImageUrl($image) }}" 
-     class="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-md border shadow-md"
-     style="position: absolute; left: {{ $index * 14 }}px; z-index: {{ 5 - $index }};">
-
-        @endforeach
-
-        @if($totalImages > 3)
-            <div class="absolute flex items-center justify-center bg-gray-700 text-white font-semibold 
-                        rounded-full shadow-md text-base"
-                 style="left: {{ count($displayImages) * 14 + 5 }}px; z-index: 6;
-                        width: clamp(20px, 2vw, 28px); 
-                        height: clamp(20px, 2vw, 28px); 
-                        font-size: clamp(10px, 1.5vw, 14px);">
-                +{{ $totalImages - 3 }}
-            </div>
-        @endif
-    </div>
-@else
-    No Images
-@endif
-
-
-
-
+                        @if($journal->image)
+                            @php
+                                $images = json_decode($journal->image, true);
+                                $totalImages = count($images);
+                                $displayImages = array_slice($images, 0, 3);
+                            @endphp
+                            <div class="relative flex items-center w-[70px] sm:w-[90px] h-10 sm:h-12 overflow-hidden">
+                                @foreach($displayImages as $index => $image)
+                                    <img src="{{ getDriveImageUrl($image) }}" 
+                                         class="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-md border shadow-md"
+                                         style="position: absolute; left: {{ $index * 14 }}px; z-index: {{ 5 - $index }};">
+                                @endforeach
+                                @if($totalImages > 3)
+                                    <div class="absolute flex items-center justify-center bg-gray-700 text-white font-semibold 
+                                                rounded-full shadow-md text-base"
+                                         style="left: {{ count($displayImages) * 14 + 5 }}px; z-index: 6;
+                                                width: clamp(20px, 2vw, 28px); 
+                                                height: clamp(20px, 2vw, 28px); 
+                                                font-size: clamp(10px, 1.5vw, 14px);">
+                                        +{{ $totalImages - 3 }}
+                                    </div>
+                                @endif
+                            </div>
+                        @else
+                            No Images
+                        @endif
                     </td>
-                    
-                    
-                    
-                    
-                    
-                    
-                    
                 </tr>
                 @endforeach
                 @if ($journals->isEmpty())
@@ -113,7 +95,6 @@
         </table>
     </div>
 </div>
-
 
 <script>
     function previewPdf() {
@@ -143,5 +124,5 @@
     });
 </script>
 
-    </div>
+</div>
 @endsection
