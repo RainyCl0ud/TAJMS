@@ -14,12 +14,56 @@
     <div class="flex items-center space-x-4 relative">
         @if(Auth::check() && Auth::user()->role === 'coordinator')
         <!-- Notification Bell -->
-        <div class="relative" x-data="{ open: false }">
+        <div class="relative" x-data="{ 
+            open: false,
+            notificationCount: 0,
+            notifications: [],
+            
+            init() {
+                this.fetchNotifications();
+                this.initializeEcho();
+            },
+
+            fetchNotifications() {
+                fetch('/api/notifications')
+                    .then(response => response.json())
+                    .then(data => {
+                        this.notifications = data.notifications;
+                        this.notificationCount = data.unread_count;
+                    });
+            },
+
+            initializeEcho() {
+                window.Echo.private('requests')
+                    .listen('NewRequestNotification', (e) => {
+                        this.notifications.unshift(e.notification);
+                        this.notificationCount++;
+                    });
+            },
+
+            markAsRead(notificationId) {
+                fetch('/api/notifications/mark-as-read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                    },
+                    body: JSON.stringify({ notification_id: notificationId })
+                })
+                .then(() => {
+                    this.notificationCount = Math.max(0, this.notificationCount - 1);
+                });
+            }
+        }">
             <button @click="open = !open" class="relative p-2 text-gray-600 hover:text-gray-800 focus:outline-none">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                 </svg>
-                <span id="notification-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">0</span>
+                <!-- Notification Badge -->
+                <span x-show="notificationCount > 0" 
+                      x-text="notificationCount"
+                      class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center animate-pulse">
+                </span>
             </button>
             
             <!-- Notification Dropdown -->
@@ -35,8 +79,33 @@
                 <div class="px-4 py-2 border-b border-gray-200">
                     <h3 class="text-sm font-semibold text-gray-700">Notifications</h3>
                 </div>
-                <div id="notification-list" class="max-h-96 overflow-y-auto">
-                    <!-- Notifications will be dynamically inserted here -->
+                <div class="max-h-96 overflow-y-auto">
+                    <template x-if="notifications.length === 0">
+                        <div class="px-4 py-3 text-sm text-gray-500 text-center">
+                            No new notifications
+                        </div>
+                    </template>
+                    <template x-for="notification in notifications" :key="notification.id">
+                        <div class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100"
+                             @click="markAsRead(notification.id)">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <img class="h-10 w-10 rounded-full" 
+                                         :src="notification.user_image || '{{ asset('storage/profile_pictures/default.png') }}'" 
+                                         :alt="notification.user_name">
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <p class="text-sm text-gray-900">
+                                        <span class="font-medium" x-text="notification.user_name"></span> 
+                                        requested a forgot 
+                                        <span x-text="notification.type === 'time_in' ? 'time in' : 'time out'"></span>
+                                        for <span x-text="notification.date"></span>
+                                    </p>
+                                    <p class="text-xs text-gray-500" x-text="notification.created_at"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
                 </div>
                 <div class="px-4 py-2 border-t border-gray-200">
                     <a href="{{ route('coordinator.requests') }}" class="text-sm text-blue-600 hover:text-blue-800">View all requests</a>
@@ -92,62 +161,14 @@
     </div>
 </header>
 
-<!-- Add Alpine.js -->
-<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<!-- Make sure Alpine.js is loaded -->
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+<!-- Make sure Laravel Echo is initialized -->
 <script>
-    // Function to update notification badge
-    function updateNotificationBadge(count) {
-        const badge = document.getElementById('notification-badge');
-        if (count > 0) {
-            badge.textContent = count;
-            badge.classList.remove('hidden');
-        } else {
-            badge.classList.add('hidden');
-        }
-    }
-
-    // Function to add a new notification
-    function addNotification(notification) {
-        const notificationList = document.getElementById('notification-list');
-        const notificationElement = document.createElement('div');
-        notificationElement.className = 'px-4 py-3 hover:bg-gray-50 border-b border-gray-100';
-        notificationElement.innerHTML = `
-            <div class="flex items-start">
-                <div class="flex-shrink-0">
-                    <img class="h-10 w-10 rounded-full" src="${notification.user_image || '{{ asset('storage/profile_pictures/default.png') }}'}" alt="${notification.user_name}">
-                </div>
-                <div class="ml-3 flex-1">
-                    <p class="text-sm text-gray-900">
-                        <span class="font-medium">${notification.user_name}</span> requested a forgot 
-                        ${notification.type === 'time_in' ? 'time in' : 'time out'} for ${notification.date}
-                    </p>
-                    <p class="text-xs text-gray-500">${notification.created_at}</p>
-                </div>
-            </div>
-        `;
-        notificationList.prepend(notificationElement);
-    }
-
-    // Initialize Echo for real-time notifications
-    window.Echo.private('requests')
-        .listen('NewRequestNotification', (e) => {
-            addNotification(e.notification);
-            const currentCount = parseInt(document.getElementById('notification-badge').textContent || '0');
-            updateNotificationBadge(currentCount + 1);
-        });
-
-    // Load initial notifications on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        if (document.getElementById('notification-list')) {
-            fetch('/api/notifications')
-                .then(response => response.json())
-                .then(data => {
-                    updateNotificationBadge(data.unread_count);
-                    data.notifications.forEach(notification => {
-                        addNotification(notification);
-                    });
-                });
+    window.addEventListener('load', function() {
+        if (typeof window.Echo === 'undefined') {
+            console.error('Laravel Echo is not initialized. Please check your broadcasting configuration.');
         }
     });
 </script>
