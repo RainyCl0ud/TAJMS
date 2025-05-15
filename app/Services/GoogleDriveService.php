@@ -19,10 +19,10 @@ class GoogleDriveService
             $this->client = new Google_Client();
             
             // Handle credentials from environment variable
-            if (env('GOOGLE_APPLICATION_CREDENTIALS_JSON')) {
+            if (env('GOOGLE_CLOUD_KEY_FILE')) {
                 try {
                     // Log the first few characters of credentials for verification
-                    $credentials = json_decode(env('GOOGLE_APPLICATION_CREDENTIALS_JSON'), true, 512, JSON_THROW_ON_ERROR);
+                    $credentials = json_decode(env('GOOGLE_CLOUD_KEY_FILE'), true, 512, JSON_THROW_ON_ERROR);
                     logger()->info('Initializing Google Drive service with project: ' . ($credentials['project_id'] ?? 'unknown'));
                     
                     // Verify required fields
@@ -53,13 +53,13 @@ class GoogleDriveService
                     logger()->error('Credentials validation error details: ' . json_encode([
                         'error' => $e->getMessage(),
                         'trace' => $e->getTraceAsString(),
-                        'credentials_start' => substr(env('GOOGLE_APPLICATION_CREDENTIALS_JSON'), 0, 50) . '...'
+                        'credentials_start' => substr(env('GOOGLE_CLOUD_KEY_FILE'), 0, 50) . '...'
                     ]));
                     throw new \RuntimeException('Invalid Google credentials configuration: ' . $e->getMessage());
                 }
             } else {
                 // Fallback to file-based credentials
-                $credentialsPath = storage_path('keys/laravel-image-storage-c0626205a852.json');
+                $credentialsPath = storage_path('keys/laravel-image-storage-33b672fbc837.json');
                 if (!file_exists($credentialsPath)) {
                     throw new \RuntimeException('Google credentials file not found: ' . $credentialsPath);
                 }
