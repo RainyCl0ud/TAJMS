@@ -40,6 +40,11 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
+# Create Google credentials directory and set permissions
+RUN mkdir -p /var/www/storage/app/google-credentials
+RUN chown -R www-data:www-data /var/www/storage/app/google-credentials
+RUN chmod -R 755 /var/www/storage/app/google-credentials
+
 # Expose port
 EXPOSE 9000
 
