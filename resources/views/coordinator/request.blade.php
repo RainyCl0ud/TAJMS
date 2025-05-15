@@ -13,69 +13,86 @@
   </div>
   @endif
   
-<div class="container mx-auto px-4 py-6">
-    <h1 class="text-2xl font-semibold text-gray-800 mb-6">Requests</h1>
-
-    <!-- Request Cards Container with lower z-index -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
-        @foreach($requests as $request)
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-            <div class="p-4">
-                <div class="flex items-center mb-4">
-                    <img src="{{ $request->user->profile_picture ?? asset('storage/profile_pictures/default.png') }}" 
-                         alt="Profile Picture" 
-                         class="w-10 h-10 rounded-full mr-4">
-                    <div>
-                        <h3 class="font-semibold text-gray-800">{{ $request->user->first_name }} {{ $request->user->last_name }}</h3>
-                        <p class="text-sm text-gray-500">{{ $request->time_elapsed }}</p>
-                    </div>
-                </div>
-                
-                <div class="mb-4">
-                    <p class="text-gray-700"><span class="font-semibold">Type:</span> {{ ucfirst($request->type) }}</p>
-                    <p class="text-gray-700"><span class="font-semibold">Date:</span> {{ $request->date }}</p>
-                    <p class="text-gray-700"><span class="font-semibold">Time:</span> {{ $request->time }}</p>
-                    <p class="text-gray-700"><span class="font-semibold">Reason:</span> {{ $request->reason }}</p>
-                </div>
-
-                @if($request->image)
-                <div class="mb-4">
-                    <img src="{{ asset('storage/' . $request->image) }}" alt="Request Image" class="w-full rounded">
-                </div>
-                @endif
-
-                <div class="flex justify-end space-x-2">
-                    @if($request->status === 'Pending')
-                    <form action="{{ route('request.approve', $request->id) }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                            Approve
-                        </button>
-                    </form>
-                    <form action="{{ route('request.reject', $request->id) }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-                            Reject
-                        </button>
-                    </form>
-                    @else
-                    <span class="px-4 py-2 rounded {{ $request->status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                        {{ $request->status }}
-                    </span>
-                    @endif
-                </div>
-            </div>
+<div class="h-screen bg-blue-100 flex flex-col p-5 overflow-auto">
+    <div class="w-full max-h-[32rem] bg-white shadow-lg rounded-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-blue-600 text-white text-center py-4 text-lg font-semibold">
+            Forgot Time In/Out Requests
         </div>
-        @endforeach
+
+        <!-- Responsive Table Wrapper (Ensure Correct Scrolling) -->
+        <div class="w-full overflow-x-auto max-h-[26rem]">
+            <table class="min-w-full border-collapse table-auto"> 
+                <thead class="bg-gray-800 text-white uppercase text-xs sm:text-sm sticky top-0 z-10">
+                    <tr>
+                        <th class="py-2 px-2 sm:py-3 sm:px-4 text-left truncate">Name</th>
+                        <th class="py-2 px-2 sm:py-3 sm:px-4 text-left truncate">Status</th>
+                        <th class="py-2 px-2 sm:py-3 sm:px-4 text-left truncate">Requested</th>
+                        <th class="py-2 px-2 sm:py-3 sm:px-4 text-center truncate">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @foreach ($requests as $request)
+                    <tr class="hover:bg-gray-100 transition cursor-pointer request-row"
+                        data-id="{{ $request->id }}"
+                        data-name="{{ $request->user ? $request->user->first_name . ' ' . $request->user->last_name : 'No Trainee' }}"
+                        data-type="{{ $request->type }}"
+                        data-status="{{ $request->status ?? '--' }}"
+                        data-date="{{ $request->date }}"
+                        data-time="{{ $request->time }}"
+                        data-reason="{{ $request->reason }}"
+                        data-attachment="{{ $request->image_url ?? '' }}">
+
+                        <td class="py-2 px-2 text-gray-800 truncate max-w-[80px] sm:max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap" 
+                            title="{{ $request->user ? $request->user->first_name . ' ' . $request->user->last_name : 'Trainee not available' }}">
+                            {{ Str::limit($request->user ? $request->user->first_name . ' ' . $request->user->last_name : 'Trainee not available', 20) }}
+                        </td>
+
+                        <!-- Status Column -->
+                        <td class="py-2 px-2 truncate">
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold
+                            {{ $request->status == 'Approved' ? 'bg-green-100 text-green-600' : 
+                            ($request->status == 'Rejected' ? 'bg-red-100 text-red-600' : 
+                            'bg-yellow-100 text-yellow-600') }}">
+                            {{ $request->status ?? 'Pending' }}
+                            </span>
+                        </td>
+
+                        <!-- Requested Column -->
+                        <td class="py-2 px-2 text-gray-800 truncate max-w-[80px] sm:max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap">
+                            {{ $request->time_elapsed }}
+                        </td>
+
+                        <!-- Action Column -->
+                        <td class="py-2 px-2 text-center truncate">
+                            @if($request->status === 'Pending')
+                            <div class="flex justify-center space-x-2">
+                                <form action="{{ route('request.approve', $request->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">
+                                        Approve
+                                    </button>
+                                </form>
+                                <form action="{{ route('request.reject', $request->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+                                        Reject
+                                    </button>
+                                </form>
+                            </div>
+                            @elseif($request->status === 'Rejected')
+                            <button type="button" class="text-gray-500 hover:text-red-700 font-semibold" onclick="showDeleteModal('{{ route('request.delete', $request->id) }}', event)">
+                                ✖
+                            </button>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
-<style>
-    /* Ensure request cards stay below dropdown */
-    .request-card {
-        z-index: 10;
-    }
-</style>
 
 <!-- Delete Confirmation Modal -->
 <div id="delete-confirmation-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
