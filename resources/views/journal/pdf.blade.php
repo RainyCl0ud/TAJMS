@@ -54,32 +54,26 @@
     <h2>Journal Records</h2>
 
     @php
-        $dayCounter = 1; // Start counting days from 1
-    @endphp
+    $dayCounter = 1; // Start counting days from 1
+@endphp
 
-    @foreach($journals->sortBy('created_at') as $journal)
-        <div class="entry">
-            <div class="day">Day {{ $dayCounter }}</div>
-            <div class="content">{{ $journal->content }}</div>
+@foreach($journals->sortBy('created_at') as $journal)
+    <div class="entry">
+        <div class="day">Day {{ $dayCounter }}</div>
+        <div class="content">{{ $journal->content }}</div>
 
-            @if($journal->image && !empty($journal->base64Images))
-    <div class="images">
-        @foreach($journal->base64Images as $base64Image)
-            <img src="{{ $base64Image }}" alt="Journal Image" />
-        @endforeach
-    </div>
-@endif
+        @if($journal->image && !empty($journal->base64Images))
+            <div class="images">
+                @foreach($journal->base64Images as $base64Image)
+                    <img src="{{ $base64Image }}" alt="Journal Image" />
+                @endforeach
+            </div>
+        @endif
+    </div>  {{-- Close .entry div --}}
 
-
-
-
-
+    @php $dayCounter++; @endphp
 @endforeach
 
-                </div>
-        </div>
-        @php $dayCounter++; @endphp
-    @endforeach
 
 </body>
 </html>
