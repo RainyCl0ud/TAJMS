@@ -68,14 +68,14 @@ onclick="location.href='{{ auth()->user()->role === 'trainee' ? route('journal.i
 
             <!-- Action Buttons -->
             <div class="mt-6 flex flex-wrap justify-start gap-4">
-                @if (request('edit'))
+                @if (request('edit') && auth()->user()->role === 'trainee')
                     <button type="submit" form="journal-form" class="px-4 py-2 text-sm font-medium text-white bg-indigo-500 rounded-md hover:bg-indigo-600 transition">
                         Save Changes
                     </button>
                     <a href="{{ route('journal.show', $journal->id) }}" class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600 transition">
                         Cancel
                     </a>
-                @else
+                @elseif(auth()->user()->role === 'trainee')
                     <a href="{{ route('journal.show', [$journal->id, 'edit' => true]) }}" class="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600 transition">
                         Edit
                     </a>
