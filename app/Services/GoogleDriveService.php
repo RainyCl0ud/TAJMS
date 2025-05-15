@@ -41,7 +41,7 @@ class GoogleDriveService
         
         // Verify credentials and connection
         try {
-            $this->driveService->files->list(['pageSize' => 1]);
+            $this->driveService->files->listFiles(['pageSize' => 1]);
             logger()->info('Google Drive service account connection verified successfully');
         } catch (\Exception $e) {
             logger()->error('Google Drive service account verification failed: ' . $e->getMessage());
