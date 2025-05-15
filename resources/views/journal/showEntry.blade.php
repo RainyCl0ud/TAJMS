@@ -42,10 +42,10 @@ onclick="location.href='{{ auth()->user()->role === 'trainee' ? route('journal.i
 
             <!-- Journal Content -->
             @if (request('edit'))
-                <form id="journal-form" method="POST" action="{{ route('journal.update', ['id' => $journal->id]) }}" class="space-y-4">
+                <form id="journal-form" method="POST" action="{{ route('journal.update', $journal->id) }}" class="space-y-4">
                     @csrf
                     @method('PATCH')
-                    <textarea name="content" class="bg-white w-full min-h-[15rem] max-h-[50vh] p-4 border resize-none overflow-y-auto text-sm sm:text-base break-words"></textarea>
+                    <textarea name="content" class="bg-white w-full min-h-[15rem] max-h-[50vh] p-4 border resize-none overflow-y-auto text-sm sm:text-base break-words">{{ $journal->content }}</textarea>
                     <x-input-error class="mt-2 text-red-500 text-sm" :messages="$errors->get('content')" />
                 </form>
             @else
