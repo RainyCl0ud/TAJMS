@@ -77,7 +77,6 @@
 @endforeach
 
                 </div>
-            @endif
         </div>
         @php $dayCounter++; @endphp
     @endforeach
