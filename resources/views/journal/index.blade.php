@@ -46,33 +46,40 @@
                     </td>
                     <td class="px-2 sm:px-4 py-4 whitespace-nowrap">{{ $journal->created_at->format('Y-m-d') }}</td>
                     <td class="px-2 sm:px-4 py-4 whitespace-nowrap">
-                        @if($journal->image)
-                            @php
-                                $images = json_decode($journal->image, true);
-                                $totalImages = count($images);
-                                $displayImages = array_slice($images, 0, 3); // Show first 3 images
-                            @endphp
-                            <div class="relative flex items-center w-[70px] sm:w-[90px] h-10 sm:h-12 overflow-hidden">
-                                @foreach($displayImages as $index => $image)
-                                    <img src="{{ asset('storage/' . $image) }}" 
-                                         class="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-md border shadow-md"
-                                         style="position: absolute; left: {{ $index * 14 }}px; z-index: {{ 5 - $index }};">
-                                @endforeach
-                    
-                                @if($totalImages > 3)
-                                    <div class="absolute flex items-center justify-center bg-gray-700 text-white font-semibold 
-                                                rounded-full shadow-md text-base"
-                                         style="left: {{ count($displayImages) * 14 + 5 }}px; z-index: 6;
-                                                width: clamp(20px, 2vw, 28px); 
-                                                height: clamp(20px, 2vw, 28px); 
-                                                font-size: clamp(10px, 1.5vw, 14px);">
-                                        +{{ $totalImages - 3 }}
-                                    </div>
-                                @endif
-                            </div>
-                        @else
-                            No Images
-                        @endif
+
+
+
+                    @if($journal->image)
+    @php
+        $images = json_decode($journal->image, true);
+        $totalImages = count($images);
+        $displayImages = array_slice($images, 0, 3);
+    @endphp
+    <div class="relative flex items-center w-[70px] sm:w-[90px] h-10 sm:h-12 overflow-hidden">
+        @foreach($displayImages as $index => $image)
+            <img src="{{ $image }}" 
+                 class="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-md border shadow-md"
+                 style="position: absolute; left: {{ $index * 14 }}px; z-index: {{ 5 - $index }};">
+        @endforeach
+
+        @if($totalImages > 3)
+            <div class="absolute flex items-center justify-center bg-gray-700 text-white font-semibold 
+                        rounded-full shadow-md text-base"
+                 style="left: {{ count($displayImages) * 14 + 5 }}px; z-index: 6;
+                        width: clamp(20px, 2vw, 28px); 
+                        height: clamp(20px, 2vw, 28px); 
+                        font-size: clamp(10px, 1.5vw, 14px);">
+                +{{ $totalImages - 3 }}
+            </div>
+        @endif
+    </div>
+@else
+    No Images
+@endif
+
+
+
+
                     </td>
                     
                     

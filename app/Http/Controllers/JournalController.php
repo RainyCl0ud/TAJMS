@@ -55,30 +55,39 @@ class JournalController extends Controller
         return view('journal.create', compact (('pageTitle')));
     }
 
-     public function store(Request $request)
-{
-    $request->validate([
-        'content' => 'required|max:65535',
-        'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate multiple images
-    ]);
-
-    // Handle image uploads
-    $imagePaths = []; // Store image paths in an array
-    if ($request->hasFile('images')) {
-        foreach ($request->file('images') as $image) {
-            $imagePaths[] = $image->store('journal_images', 'public');
+    public function store(Request $request)
+    {
+        $request->validate([
+            'content' => 'required|max:65535',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // max 5MB
+        ]);
+    
+        $imageUrls = [];
+    
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                // Store image in Google Drive (in "journal_images" folder)
+                $path = $image->store('journal_images', 'google');
+    
+                // Extract Google Drive file ID
+                $fileId = basename($path);
+    
+                // Generate public preview/download URL
+                $url = "https://drive.google.com/uc?id={$fileId}&export=download";
+    
+                $imageUrls[] = $url;
+            }
         }
+    
+        Journal::create([
+            'user_id' => Auth::id(),
+            'content' => $request->input('content'),
+            'image' => json_encode($imageUrls),
+        ]);
+    
+        return redirect()->route('journal.index')->with('success', 'Journal entry created successfully.');
     }
-
-    // Create a new journal entry
-    Journal::create([
-        'user_id' => Auth::id(),
-        'content' => $request->input('content'),
-        'image' => json_encode($imagePaths), // Save as JSON string
-    ]);
-
-    return redirect()->route('journal.index')->with('success', 'Journal entry created successfully.');
-}
+    
 
 
     public function update(Request $request, $id)
