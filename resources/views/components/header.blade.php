@@ -1,4 +1,4 @@
-<header class="h-20 flex justify-between items-center m-0 border-b-2 border-gray-300 px-6 shadow-lg sticky top-0 bg-white overlow-auto">
+<header class="h-20 flex justify-between items-center m-0 border-b-2 border-gray-300 px-6 shadow-lg sticky top-0 bg-white overlow-auto z-40">
     <div class="flex items-center space-x-4">
         <!-- Hamburger Icon (Visible on Small Screens) -->
         <button id="menuToggle" class="text-gray-700 md:hidden focus:outline-none">
@@ -150,5 +150,15 @@
     
     .max-h-96::-webkit-scrollbar-thumb:hover {
         background: #555;
+    }
+    
+    /* Ensure dropdown is always on top */
+    .group-hover\:block {
+        z-index: 9999 !important;
+    }
+    
+    /* Dashboard cards should have lower z-index */
+    .dashboard-card {
+        z-index: 10;
     }
 </style>

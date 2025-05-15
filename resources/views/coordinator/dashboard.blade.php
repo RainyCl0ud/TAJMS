@@ -9,14 +9,14 @@
         <!-- Dashboard Header -->
         <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-lg shadow-md">
             <h1 class="text-3xl font-bold">Dashboard</h1>
-            <p class="text-sm mt-1">Welcome back! Here’s what’s happening today.</p>
+            <p class="text-sm mt-1">Welcome back! Here's what's happening today.</p>
         </div>
 
         <!-- Overview Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             <!-- Total Users Box -->
-            <div class="p-6 bg-purple-500 text-white rounded-lg shadow-lg transition-all duration-500 transform hover:scale-110 hover:bg-purple-700 cursor-pointer">
+            <div class="dashboard-card bg-purple-500 text-white rounded-lg shadow-lg p-6 relative overflow-hidden">
                 <div class="flex justify-between items-center">
                     <div>
                         <h1 class="text-xl font-semibold">Total Users</h1>
@@ -30,7 +30,7 @@
             </div>
 
             <!-- Pre-Users Box -->
-            <a class="relative p-6 bg-blue-500 text-white rounded-lg shadow-lg cursor-pointer transition-all duration-500 transform hover:scale-110 hover:bg-blue-700"
+            <a class="dashboard-card bg-blue-500 text-white rounded-lg shadow-lg p-6 relative overflow-hidden cursor-pointer transition-all duration-500 transform hover:scale-110 hover:bg-blue-700"
                href="{{ route('coordinator.pre_users') }}">
                 <div class="flex justify-between items-center">
                     <div>
@@ -45,7 +45,7 @@
             </a>
 
             <!-- Trainees Box -->
-            <a class="relative p-6 bg-green-500 text-white rounded-lg shadow-lg cursor-pointer transition-all duration-500 transform hover:scale-110 hover:bg-green-700"
+            <a class="dashboard-card bg-green-500 text-white rounded-lg shadow-lg p-6 relative overflow-hidden cursor-pointer transition-all duration-500 transform hover:scale-110 hover:bg-green-700"
                href="{{ route('coordinator.trainees') }}">
                 <div class="flex justify-between items-center">
                     <div>

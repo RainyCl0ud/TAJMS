@@ -22,7 +22,7 @@
         <a href="{{ route('coordinator.dashboard') }}" class="back flex justify-between ml-auto bg-red-500 text-white p-2 rounded-lg">←GO Back</a>
     </div>
     
-    <div class="rounded-lg shadow-lg bg-white border border-black max-h-[25rem] overflow-hidden"> <!-- Changed overflow to hidden -->
+    <div class="rounded-lg shadow-lg bg-white border border-black max-h-[25rem] overflow-hidden relative z-10">
         <div class="overflow-x-auto max-w-full">
             <table class="min-w-full">
                 <thead class="bg-gray-800 text-white">
@@ -39,7 +39,7 @@
                     </tr>
                 </thead>
             </table>
-            <div class="overflow-y-auto" style="max-height: calc(25rem - 3rem);"> <!-- Adjust max-height for tbody scrolling -->
+            <div class="overflow-y-auto" style="max-height: calc(25rem - 3rem);">
                 <table class="min-w-full">
                     <tbody id="table-body">
                         @foreach ($trainees as $user)
@@ -85,4 +85,11 @@
         });
     });
 </script>
+
+<style>
+    /* Ensure table container stays below dropdown */
+    .table-container {
+        z-index: 10;
+    }
+</style>
 @endsection
