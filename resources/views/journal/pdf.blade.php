@@ -76,13 +76,16 @@
         }
     @endphp
 
-    @if (!empty($journal->base64Images))
+   @if(!empty($journal->base64Images))
     <div class="images">
-        @foreach ($journal->base64Images as $base64Image)
+        @foreach($journal->base64Images as $base64Image)
             <img src="{{ $base64Image }}" alt="Journal Image" />
         @endforeach
     </div>
 @endif
+
+
+
 
 @endforeach
 

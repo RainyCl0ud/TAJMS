@@ -6,6 +6,7 @@ use App\Models\Journal;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Services\GoogleDriveService;
@@ -141,30 +142,21 @@ class JournalController extends Controller
                 ->orderBy('created_at', 'asc')
                 ->get();
     
-            // Prepare journals with base64 images
             foreach ($journals as $journal) {
+                $journal->base64Images = [];
+                
                 if ($journal->image) {
                     $images = json_decode($journal->image, true);
-                    $base64Images = [];
-    
-                    foreach ($images as $imageUrl) {
-                        // Download the image data from Google Drive
-                        $imageData = @file_get_contents($imageUrl);
-    
-                        if ($imageData !== false) {
-                            $finfo = finfo_open();
-                            $mimeType = finfo_buffer($finfo, $imageData, FILEINFO_MIME_TYPE);
-                            finfo_close($finfo);
-    
-                            // Encode image data as base64 string
-                            $base64 = 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
-                            $base64Images[] = $base64;
+                    if (is_array($images)) {
+                        foreach ($images as $imageUrl) {
+                            $imageData = @file_get_contents($imageUrl);
+                            if ($imageData !== false) {
+                                $mimeType = (new finfo(FILEINFO_MIME_TYPE))->buffer($imageData);
+                                $base64 = 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
+                                $journal->base64Images[] = $base64;
+                            }
                         }
                     }
-    
-                    $journal->base64Images = $base64Images;
-                } else {
-                    $journal->base64Images = [];
                 }
             }
     
