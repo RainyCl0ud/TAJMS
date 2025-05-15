@@ -83,6 +83,7 @@
                 @endif
             </tbody>
         </table>
+        <pre>{{ $image }}</pre>
     </div>
 </div>
 
