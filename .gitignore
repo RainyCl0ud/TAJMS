@@ -1,7 +1,7 @@
 /vendor/
 /node_modules/
 /public/hot
-/storage/*.key
+/storage/keys/*
 /storage/app/*
 /storage/framework/cache/*
 /storage/framework/sessions/*
