@@ -153,7 +153,7 @@ class JournalController extends Controller
                             curl_setopt($ch, CURLOPT_URL, $imageUrl);
                             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                            curl_setopt($ch, CURLOPT_HEADER, true);
+                            curl_setopt($ch, CURLOPT_HEADER, false);
                             
                             $response = curl_exec($ch);
                             $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);

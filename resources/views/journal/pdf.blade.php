@@ -58,42 +58,21 @@
     @endphp
 
     @foreach($journals->sortBy('created_at') as $journal)
-        <div class="entry">
-            <div class="day">Day {{ $dayCounter }}</div>
-            <div class="content">{{ $journal->content }}</div>
+    <div class="entry">
+        <div class="day">Day {{ $dayCounter }}</div>
+        <div class="content">{{ $journal->content }}</div>
 
-            @if($journal->image)
-                @php
-                    $images = json_decode($journal->image, true);
-                @endphp
-                <div class="images">
-                @foreach($images as $image)
-    @php
-        $imagePath = public_path('storage/' . $image);
-        if (file_exists($imagePath)) {
-            $imageData = base64_encode(file_get_contents($imagePath));
-            $mimeType = mime_content_type($imagePath);
-        }
-    @endphp
-
-   @if(!empty($journal->base64Images))
-    <div class="images">
-        @foreach($journal->base64Images as $base64Image)
-            <img src="{{ $base64Image }}" alt="Journal Image" />
-        @endforeach
+        @if(!empty($journal->base64Images))
+            <div class="images">
+                @foreach($journal->base64Images as $base64Image)
+                    <img src="{{ $base64Image }}" alt="Journal Image" />
+                @endforeach
+            </div>
+        @endif
     </div>
-@endif
-
-
-
-
+    @php $dayCounter++; @endphp
 @endforeach
 
-                </div>
-            @endif
-        </div>
-        @php $dayCounter++; @endphp
-    @endforeach
 
 </body>
 </html>
