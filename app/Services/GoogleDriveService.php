@@ -15,11 +15,38 @@ class GoogleDriveService
     public function __construct()
     {
         $this->client = new Google_Client();
-        $this->client->setAuthConfig(storage_path('keys/laravel-image-storage-c0626205a852.json')); // ✅ Update with actual filename
-        $this->client->addScope(Google_Service_Drive::DRIVE);
+        
+        // Handle credentials from environment variable
+        if (env('GOOGLE_APPLICATION_CREDENTIALS_JSON')) {
+            // Create a temporary file with the credentials
+            $tempFile = tempnam(sys_get_temp_dir(), 'google_credentials_');
+            file_put_contents($tempFile, env('GOOGLE_APPLICATION_CREDENTIALS_JSON'));
+            $this->client->setAuthConfig($tempFile);
+            unlink($tempFile); // Clean up the temporary file
+        } else {
+            // Fallback to file-based credentials
+            $this->client->setAuthConfig(storage_path('keys/laravel-image-storage-c0626205a852.json'));
+        }
+        
+        // Define explicit scopes needed for file operations
+        $this->client->addScope([
+            Google_Service_Drive::DRIVE_FILE,  // Per-file access
+            Google_Service_Drive::DRIVE_METADATA_READONLY  // Read metadata
+        ]);
+        
         $this->client->setAccessType('offline');
+        $this->client->setApplicationName(env('APP_NAME', 'TAJMS') . ' Profile Pictures');
 
         $this->driveService = new Google_Service_Drive($this->client);
+        
+        // Verify credentials and connection
+        try {
+            $this->driveService->files->list(['pageSize' => 1]);
+            logger()->info('Google Drive service account connection verified successfully');
+        } catch (\Exception $e) {
+            logger()->error('Google Drive service account verification failed: ' . $e->getMessage());
+            throw new \RuntimeException('Failed to initialize Google Drive service: ' . $e->getMessage());
+        }
     }
 
     public function uploadFile($filePath, $mimeType, $originalName = null)
@@ -29,7 +56,7 @@ class GoogleDriveService
     
             $fileMetadata = new Google_Service_Drive_DriveFile([
                 'name' => $filename,
-                'parents' => ['1jK02cuiyp3q93-A8aDqje7KIcWq7lebP']
+                'parents' => [env('GOOGLE_DRIVE_FOLDER_ID', '1jK02cuiyp3q93-A8aDqje7KIcWq7lebP')]
             ]);
     
             $file = $this->driveService->files->create($fileMetadata, [
@@ -51,6 +78,18 @@ class GoogleDriveService
             return "https://drive.google.com/uc?export=view&id=" . $file->id;
         } catch (Google_Service_Exception $e) {
             logger()->error('Google Drive upload error: ' . $e->getMessage());
+            logger()->error('Error details: ' . json_encode([
+                'error_code' => $e->getCode(),
+                'error_message' => $e->getMessage(),
+                'error_errors' => $e->getErrors(),
+                'file_path' => $filePath,
+                'mime_type' => $mimeType,
+                'original_name' => $originalName
+            ]));
+            return null;
+        } catch (\Exception $e) {
+            logger()->error('Unexpected error during Google Drive upload: ' . $e->getMessage());
+            logger()->error('Stack trace: ' . $e->getTraceAsString());
             return null;
         }
     }
