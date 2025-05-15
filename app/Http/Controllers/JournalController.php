@@ -149,10 +149,21 @@ class JournalController extends Controller
                     $images = json_decode($journal->image, true);
                     if (is_array($images)) {
                         foreach ($images as $imageUrl) {
-                            $imageData = @file_get_contents($imageUrl);
-                            if ($imageData !== false) {
-                                $mimeType = mime_content_type($imageUrl);
-                                $base64 = 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
+                            $ch = curl_init();
+                            curl_setopt($ch, CURLOPT_URL, $imageUrl);
+                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                            curl_setopt($ch, CURLOPT_HEADER, true);
+                            
+                            $response = curl_exec($ch);
+                            $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+                            $body = substr($response, $headerSize);
+                            $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+                            
+                            curl_close($ch);
+
+                            if ($body) {
+                                $base64 = 'data:' . $contentType . ';base64,' . base64_encode($body);
                                 $journal->base64Images[] = $base64;
                             }
                         }
