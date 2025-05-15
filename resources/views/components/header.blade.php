@@ -6,30 +6,44 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
             </svg>
         </button>
-
         <!-- Page Title -->
         <h1 class="text-lg sm:text-sm md:text-2xl font-semibold text-gray-800 cursor-default break-words mr-5">
             {{ $pageTitle }}
         </h1>
     </div>
-
     <div class="flex items-center space-x-4 relative">
         <x-dropdown align="right" width="48">
-            <x-slot name="trigger">
-                @if(Auth::check())
-                    <div class="flex items-center cursor-pointer">
-                        <div class="text-gray-700 hidden md:flex flex-col ml-2">
-                            <span class="text-sm">{{ ucfirst(Auth::user()->first_name . ' ' . Auth::user()->last_name) }}</span>
-                            <span class="block text-xs text-gray-500">{{ Auth::user()->role }}</span>
-                        </div>
-                        <img src="{{ Auth::user()->profile_picture 
-                        ? asset('storage/' . Auth::user()->profile_picture) 
-                        : asset('images/profile_empty.png') }}"  
-                 alt="Profile picture" class="h-10 w-10 rounded-full ml-2 object-cover cursor-pointer border border-black hover:shadow-lg hover:shadow-blue-300">
-            
-                    </div>
-                @endif
-            </x-slot>
+           <x-slot name="trigger">
+    @if(Auth::check())
+        @php
+            $url = Auth::user()->profile_picture;
+            $fileId = null;
+
+            if (str_contains($url, 'id=')) {
+                parse_str(parse_url($url, PHP_URL_QUERY), $query);
+                $fileId = $query['id'] ?? null;
+            } elseif (preg_match('/\/d\/(.*?)\//', $url, $matches)) {
+                $fileId = $matches[1];
+            }
+
+            $finalImageUrl = $fileId ? "https://drive.google.com/thumbnail?id={$fileId}" : null;
+        @endphp
+
+        <div class="flex items-center cursor-pointer">
+            <div class="text-gray-700 hidden md:flex flex-col ml-2">
+                <span class="text-sm">{{ ucfirst(Auth::user()->first_name . ' ' . Auth::user()->last_name) }}</span>
+                <span class="block text-xs text-gray-500">{{ Auth::user()->role }}</span>
+            </div>
+
+            <img src="{{ $finalImageUrl ?? asset('storage/profile_pictures/default.png') }}"
+                 alt="{{ Auth::user()->first_name }}'s Profile Picture"
+                 class="h-10 w-10 rounded-full ml-2 object-cover cursor-pointer border border-black hover:shadow-lg hover:shadow-blue-300"
+                 onerror="this.onerror=null;this.src='{{ asset('storage/profile_pictures/default.png') }}'; console.error('Failed to load profile picture');">
+        </div>
+    @endif
+</x-slot>
+
+
             <x-slot name="content">
                 <x-dropdown-link href="{{ route('profile.edit') }}">
                     Profile
