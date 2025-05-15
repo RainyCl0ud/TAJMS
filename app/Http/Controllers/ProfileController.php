@@ -2,65 +2,55 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Journal;
-use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\GoogleDriveService;
 
 class ProfileController extends Controller
 {
+    protected $drive;
 
-    
-    public function edit(Request $request): View
+    public function __construct(GoogleDriveService $drive)
     {
-        return view('profile.edit', ['user' => $request->user(),
+        $this->drive = $drive;
+    }
+
+    public function edit(Request $request)
+    {
+        return view('profile.edit', [
+            'user' => $request->user(),
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
-{
-    $user = $request->user();
-    $user->fill($request->validated());
-
-    // Handle profile picture upload
-   // Handle profile picture upload
-if ($request->hasFile('profile_picture')) {
-    $profilePic = $request->file('profile_picture');
-    $fileName = time() . '.' . $profilePic->getClientOriginalExtension();
-
-    // Store the image in public storage
-    $path = $profilePic->storeAs('profile_pictures', $fileName, 'public');
-
-    // Remove old profile picture if it's not the default one
-    if ($user->profile_picture && $user->profile_picture !== 'profile_pictures/default.png') {
-        $oldPicPath = public_path('storage/' . $user->profile_picture);
-        if (file_exists($oldPicPath)) {
-            unlink($oldPicPath);
+    public function update(ProfileUpdateRequest $request)
+    {
+        $user = $request->user();
+        $user->fill($request->validated());
+    
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $mimeType = $file->getMimeType();
+            $tempPath = $file->getRealPath();
+            $originalName = $file->getClientOriginalName(); // ✅ Get actual filename
+    
+            $fileUrl = $this->drive->uploadFile($tempPath, $mimeType, $originalName);
+    
+            if ($fileUrl) {
+                $user->profile_picture = str_replace('@https://', 'https://', $fileUrl);
+            } else {
+                return back()->withErrors(['profile_picture' => 'Failed to upload to Google Drive.']);
+            }
         }
+    
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+    
+        $user->save();
+    
+        return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
-
-    // Save the new file path in the database
-    $user->profile_picture = $path;
-} elseif (!$user->profile_picture) {
-    // Ensure the default is assigned if missing
-    $user->profile_picture = 'profile_pictures/default.png';
-}
-
-
-    if ($user->isDirty('email')) {
-        $user->email_verified_at = null;
-    }
-
-    $user->save();
-
-    return Redirect::route('profile.edit')->with('status', 'profile-updated');
-}
-
-
+    
 }
