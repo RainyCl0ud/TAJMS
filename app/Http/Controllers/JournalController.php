@@ -66,7 +66,7 @@ class JournalController extends Controller
     {
         $request->validate([
             'content' => 'required|max:65535',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,pdf|max:2048',
         ]);
 
         $imageUrls = [];
