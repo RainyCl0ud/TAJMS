@@ -11,18 +11,15 @@
      {{ session('success') ?? session('error') }}
  </div>
  @endif
-    
+
     <div class="flex justify-between items-center mb-5">
         <a href="{{ route('journal.create') }}" class="bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 transition duration-300 text-sm sm:text-base">
             Create New Journal Entry
         </a>
 
-
-
         <button onclick="previewPdf()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm sm:text-base">
             Preview PDF
         </button>
-
     </div>
 
    <!-- Journal Entries Table -->
@@ -46,50 +43,47 @@
                     </td>
                     <td class="px-2 sm:px-4 py-4 whitespace-nowrap">{{ $journal->created_at->format('Y-m-d') }}</td>
                     <td class="px-2 sm:px-4 py-4 whitespace-nowrap">
-
-
-
                     @if($journal->image)
-    @php
-        $images = json_decode($journal->image, true);
-        $totalImages = count($images);
-        $displayImages = array_slice($images, 0, 3);
-    @endphp
-    <div class="relative flex items-center w-[70px] sm:w-[90px] h-10 sm:h-12 overflow-hidden">
-        @foreach($displayImages as $index => $image)
-            <img src="{{ $image }}" 
-                 class="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-md border shadow-md"
-                 style="position: absolute; left: {{ $index * 14 }}px; z-index: {{ 5 - $index }};">
-        @endforeach
+                        @php
+                            $images = json_decode($journal->image, true);
+                            $totalImages = count($images);
+                            $displayImages = array_slice($images, 0, 3);
 
-        @if($totalImages > 3)
-            <div class="absolute flex items-center justify-center bg-gray-700 text-white font-semibold 
-                        rounded-full shadow-md text-base"
-                 style="left: {{ count($displayImages) * 14 + 5 }}px; z-index: 6;
-                        width: clamp(20px, 2vw, 28px); 
-                        height: clamp(20px, 2vw, 28px); 
-                        font-size: clamp(10px, 1.5vw, 14px);">
-                +{{ $totalImages - 3 }}
-            </div>
-        @endif
-    </div>
-@else
-    No Images
-@endif
+                            function getDriveImageUrl($url) {
+                                if (preg_match('/\/d\/(.*?)\//', $url, $matches)) {
+                                    return 'https://drive.google.com/uc?export=view&id=' . $matches[1];
+                                } elseif (preg_match('/id=([^&]+)/', $url, $matches)) {
+                                    return 'https://drive.google.com/uc?export=view&id=' . $matches[1];
+                                }
+                                return $url;
+                            }
+                        @endphp
 
+                        <div class="relative flex items-center w-[70px] sm:w-[90px] h-10 sm:h-12 overflow-hidden">
+                            @foreach($displayImages as $index => $image)
+                                <img src="{{ getDriveImageUrl($image) }}" 
+                                     class="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-md border shadow-md"
+                                     style="position: absolute; left: {{ $index * 14 }}px; z-index: {{ 5 - $index }};">
+                            @endforeach
 
-
-
+                            @if($totalImages > 3)
+                                <div class="absolute flex items-center justify-center bg-gray-700 text-white font-semibold 
+                                            rounded-full shadow-md text-base"
+                                     style="left: {{ count($displayImages) * 14 + 5 }}px; z-index: 6;
+                                            width: clamp(20px, 2vw, 28px); 
+                                            height: clamp(20px, 2vw, 28px); 
+                                            font-size: clamp(10px, 1.5vw, 14px);">
+                                    +{{ $totalImages - 3 }}
+                                </div>
+                            @endif
+                        </div>
+                    @else
+                        No Images
+                    @endif
                     </td>
-                    
-                    
-                    
-                    
-                    
-                    
-                    
                 </tr>
                 @endforeach
+
                 @if ($journals->isEmpty())
                 <tr>
                     <td colspan="4" class="text-center py-4 text-gray-500">
@@ -101,7 +95,6 @@
         </table>
     </div>
 </div>
-
 
 <script>
     function previewPdf() {
@@ -131,5 +124,5 @@
     });
 </script>
 
-    </div>
+</div>
 @endsection
