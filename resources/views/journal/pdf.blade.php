@@ -76,11 +76,14 @@
         }
     @endphp
 
-    @if (!empty($imageData))
-        <img src="data:{{ $mimeType }};base64,{{ $imageData }}" alt="Journal Image">
-    @else
-        <p style="color:red;">Image not found: {{ $image }}</p>
-    @endif
+    @if (!empty($journal->base64Images))
+    <div class="images">
+        @foreach ($journal->base64Images as $base64Image)
+            <img src="{{ $base64Image }}" alt="Journal Image" />
+        @endforeach
+    </div>
+@endif
+
 @endforeach
 
                 </div>

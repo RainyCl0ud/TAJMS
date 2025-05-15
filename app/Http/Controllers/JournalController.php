@@ -132,25 +132,46 @@ class JournalController extends Controller
     }
 
     
-
     public function previewPdf()
     {
         try {
             $user = Auth::user();
     
             $journals = Journal::where('user_id', $user->id)
-                ->with('user')
-                ->orderBy('created_at', 'desc')
+                ->orderBy('created_at', 'asc')
                 ->get();
+    
+            // Prepare journals with base64 images
+            foreach ($journals as $journal) {
+                if ($journal->image) {
+                    $images = json_decode($journal->image, true);
+                    $base64Images = [];
+    
+                    foreach ($images as $imageUrl) {
+                        // Download the image data from Google Drive
+                        $imageData = @file_get_contents($imageUrl);
+    
+                        if ($imageData !== false) {
+                            $finfo = finfo_open();
+                            $mimeType = finfo_buffer($finfo, $imageData, FILEINFO_MIME_TYPE);
+                            finfo_close($finfo);
+    
+                            // Encode image data as base64 string
+                            $base64 = 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
+                            $base64Images[] = $base64;
+                        }
+                    }
+    
+                    $journal->base64Images = $base64Images;
+                } else {
+                    $journal->base64Images = [];
+                }
+            }
     
             $pdf = Pdf::loadView('journal.pdf', compact('journals'))
                 ->setPaper('A4', 'portrait');
     
-            // Stream PDF directly to the browser
             return $pdf->stream('journal_report_' . $user->id . '.pdf');
-    
-            // For force download:
-            // return $pdf->download('journal_report_' . $user->id . '.pdf');
     
         } catch (\Exception $e) {
             Log::error('Journal PDF generation failed: ' . $e->getMessage());
@@ -163,7 +184,6 @@ class JournalController extends Controller
         }
     }
     
-
     }
 
    
