@@ -11,7 +11,7 @@
         </button>
     </div>
 
-   @if(count($journals) > 0)
+   @unless($journals->isEmpty())
    <!-- Journal Entries Table -->
    <div class="overflow-hidden rounded-lg shadow-lg border border-black shadow-lg shadow-black">
        <div class="max-h-[calc(100vh-20rem)] sm:max-h-[calc(100vh-15rem)] overflow-auto">
@@ -71,6 +71,6 @@
    <div class="mt-6 md:mt-8 text-center">
        <p class="text-sm md:text-lg text-gray-500">No journal entries available for this trainee.</p>
    </div>
-   @endif
+   @endunless
 </div>
 @endsection
