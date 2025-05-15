@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Services\GoogleDriveService;
 
 
+
 class JournalController extends Controller
 {
     protected $drive;
@@ -133,23 +134,22 @@ class JournalController extends Controller
     
 
 
-public function previewPdf(): JsonResponse
-{
-    $journals = Journal::with('user')->orderBy('created_at', 'desc')->get();
-
-    // Generate the PDF with a refined layout
-    $pdf = Pdf::loadView('journal.pdf', compact('journals'))
-        ->setPaper('A4', 'portrait');
-
-    // Define a unique PDF filename
-    $pdfPath = 'journal_pdfs/journal_records_' . time() . '.pdf';
-
-    // Store the PDF in public storage
-    Storage::disk('public')->put($pdfPath, $pdf->output());
-
-    // Return JSON response with the correct URL
-    return response()->json(['url' => asset('storage/' . $pdfPath)]);
-}
+    public function previewPdf(): JsonResponse
+    {
+        $journals = Journal::with('user')->orderBy('created_at', 'desc')->get();
+    
+        // Generate the PDF in memory
+        $pdf = Pdf::loadView('journal.pdf', compact('journals'))
+                  ->setPaper('A4', 'portrait');
+    
+        // Encode PDF output as base64
+        $base64Pdf = base64_encode($pdf->output());
+    
+        // Return a data URI that can be opened in a new tab
+        $dataUri = 'data:application/pdf;base64,' . $base64Pdf;
+    
+        return response()->json(['url' => $dataUri]);
+    }
 
     }
 
