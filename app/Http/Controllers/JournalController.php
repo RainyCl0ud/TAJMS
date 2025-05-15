@@ -8,11 +8,18 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Services\GoogleDriveService;
 
 
 class JournalController extends Controller
 {
-     
+    protected $drive;
+
+    public function __construct(GoogleDriveService $drive)
+    {
+        $this->drive = $drive;
+    }
+
     public function index()
     {
         $pageTitle = 'My Journals';
@@ -59,32 +66,39 @@ class JournalController extends Controller
     {
         $request->validate([
             'content' => 'required|max:65535',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // max 5MB
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-    
+
         $imageUrls = [];
-    
+
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                // Store image in Google Drive (in "journal_images" folder)
-                $path = $image->store('journal_images', 'google');
-    
-                // Extract Google Drive file ID
-                $fileId = basename($path);
-    
-                // Generate public preview/download URL
-                $url = "https://drive.google.com/uc?id={$fileId}&export=download";
-    
-                $imageUrls[] = $url;
+                $mimeType = $image->getMimeType();
+                $tempPath = $image->getRealPath();
+                $originalName = $image->getClientOriginalName();
+
+                try {
+                    $uploadedUrl = $this->drive->uploadFile($tempPath, $mimeType, $originalName);
+                    if ($uploadedUrl) {
+                        $imageUrls[] = str_replace('@https://', 'https://', $uploadedUrl);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Error uploading journal image to Google Drive', [
+                        'user_id' => Auth::id(),
+                        'exception_message' => $e->getMessage(),
+                        'file_name' => $originalName,
+                    ]);
+                    return redirect()->back()->with('error', 'Failed to upload one or more images. Please try again.');
+                }
             }
         }
-    
+
         Journal::create([
             'user_id' => Auth::id(),
             'content' => $request->input('content'),
             'image' => json_encode($imageUrls),
         ]);
-    
+
         return redirect()->route('journal.index')->with('success', 'Journal entry created successfully.');
     }
     
