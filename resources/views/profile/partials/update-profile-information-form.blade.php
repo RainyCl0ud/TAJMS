@@ -1,12 +1,44 @@
 <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
     <header class="mb-6 text-center sm:text-left">
-        <h2 class="text-lg sm:text-xl font-medium text-black">
-            {{ __('Profile Information') }}
-        </h2>
+        <div class="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
+            @php
+                $url = Auth::user()->profile_picture;
+                $fileId = null;
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information, email address, and profile picture.") }}
-        </p>
+                // Try to extract id from any format
+                if (str_contains($url, 'id=')) {
+                    parse_str(parse_url($url, PHP_URL_QUERY), $query);
+                    $fileId = $query['id'] ?? null;
+                } elseif (preg_match('/\/d\/(.*?)\//', $url, $matches)) {
+                    $fileId = $matches[1];
+                }
+
+                $finalImageUrl = $fileId ? "https://drive.google.com/thumbnail?id={$fileId}" : null;
+            @endphp
+
+            <div class="h-24 w-24 relative rounded-full overflow-hidden border border-black shadow-lg">
+                @if($finalImageUrl)
+                    <img src="{{ $finalImageUrl }}"
+                         class="w-full h-full object-cover"
+                         alt="{{ Auth::user()->first_name }}'s Profile Picture"
+                         onerror="this.onerror=null;this.src='{{ asset('storage/profile_pictures/default.png') }}';">
+                @else
+                    <img src="{{ asset('storage/profile_pictures/default.png') }}"
+                         class="w-full h-full object-cover"
+                         alt="{{ Auth::user()->first_name }}'s Profile Picture">
+                @endif
+            </div>
+
+            <div>
+                <h2 class="text-lg sm:text-xl font-medium text-black">
+                    {{ __('Profile Information') }}
+                </h2>
+
+                <p class="mt-1 text-sm text-gray-600">
+                    {{ __("Update your account's profile information, email address, and profile picture.") }}
+                </p>
+            </div>
+        </div>
     </header>
 
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
@@ -17,16 +49,7 @@
         @csrf
         @method('patch')
 
-        <!-- Profile Picture Display -->
         <div class="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
-            <div class="h-24 w-24 relative rounded-full overflow-hidden border border-black shadow-lg">
-                <img src="{{ Auth::user()->profile_picture 
-                            ? asset('storage/' . Auth::user()->profile_picture) 
-                            : asset('storage/profile_pictures/default.png') }}"  
-                     alt="Profile Picture" class="w-full h-full object-cover"
-                     onerror="this.onerror=null; this.src='{{ asset('images/profile_empty.png') }}';">
-            </div>
-
             <div class="w-full sm:w-auto">
                 <label for="profile_picture" class="block text-black font-medium">
                     {{ __('Change Profile Picture') }}
