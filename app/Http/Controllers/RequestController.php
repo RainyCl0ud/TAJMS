@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Absent;
 use App\Models\Request;
+use App\Models\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request as HttpRequest;
 
@@ -14,9 +15,7 @@ class RequestController extends Controller
     {
         // Mark all notifications as read when coordinator views requests
         if (auth()->user()->role === 'coordinator') {
-            \App\Models\Notification::whereHas('request', function ($query) {
-                $query->where('coordinator_id', auth()->id());
-            })->update(['read' => true]);
+            Notification::where('read', false)->update(['read' => true]);
         }
 
         $requests = Request::with('trainee')->latest()->get();
