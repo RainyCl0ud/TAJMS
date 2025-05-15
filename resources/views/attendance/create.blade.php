@@ -55,12 +55,18 @@
                         <h2 class="text-xs sm:text-sm md:text-lg font-semibold text-gray-800 text-center sm:text-left">
                             Attendance Records
                         </h2>
-                        <button onclick="previewPdf()" 
-                            class="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-xs sm:text-sm md:text-base 
-                                bg-red-500 text-white rounded-lg hover:bg-red-800 transition 
-                                w-[7rem] sm:w-[8rem] md:w-[9rem]">
-                            Preview PDF
-                        </button>
+
+
+                        <button id="previewPdfBtn"
+    class="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-xs sm:text-sm md:text-base 
+        bg-red-500 text-white rounded-lg hover:bg-red-800 transition 
+        w-[7rem] sm:w-[8rem] md:w-[9rem]">
+    Preview PDF
+</button>
+
+
+
+
                     </div>
                     <p class="overV mb-5">&#x24D8; Recent attendance records</p>
                     <div class="overflow-x-auto">
@@ -195,6 +201,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Optional: Stop the webcam when the user navigates away from the page
 window.addEventListener('beforeunload', stopWebcam)
+document.getElementById('previewPdfBtn').addEventListener('click', function () {
+    const button = this;
+    const originalText = button.innerText;
+    button.innerText = 'Loading...';
+    button.disabled = true;
+
+    fetch("{{ route('attendance.preview-pdf') }}")
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.url) {
+                window.open(data.url, '_blank');
+            } else {
+                alert("PDF generation failed. Please try again.");
+                console.error(data.message || 'Unknown error');
+            }
+        })
+        .catch(error => {
+            alert("An error occurred while generating the PDF.");
+            console.error("Preview PDF error:", error);
+        })
+        .finally(() => {
+            button.innerText = originalText;
+            button.disabled = false;
+        });
+});
+
 
     </script>
 
