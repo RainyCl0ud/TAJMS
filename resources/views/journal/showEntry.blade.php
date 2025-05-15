@@ -56,15 +56,19 @@ onclick="location.href='{{ auth()->user()->role === 'trainee' ? route('journal.i
 
             <!-- Display Attached Images -->
             @if($journal->image)
-    @php $images = json_decode($journal->image, true) ?? []; @endphp
-    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 w-full">
-        @foreach($images as $image)
-            <div class="border border-gray-300 rounded-md overflow-hidden">
-                <img src="{{ $image }}" alt="Journal Image" class="w-full h-24 sm:h-32 md:h-36 lg:h-40 object-cover rounded-md border shadow-sm">
-            </div>                        
-        @endforeach
-    </div>                    
-@endif
+                @php $images = json_decode($journal->image, true) ?? []; @endphp
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 w-full">
+                    @foreach($images as $image)
+                        <div class="border border-gray-300 rounded-md overflow-hidden">
+                            <x-google-drive-image 
+                                :url="$image"
+                                :alt="'Journal Image'"
+                                class="w-full h-24 sm:h-32 md:h-36 lg:h-40 object-cover rounded-md border shadow-sm"
+                            />
+                        </div>                        
+                    @endforeach
+                </div>                    
+            @endif
 
 
             <!-- Action Buttons -->
