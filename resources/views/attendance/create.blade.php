@@ -55,15 +55,14 @@
                         <h2 class="text-xs sm:text-sm md:text-lg font-semibold text-gray-800 text-center sm:text-left">
                             Attendance Records
                         </h2>
+                        
 
-
-                        <button id="previewPdfBtn"
-    class="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-xs sm:text-sm md:text-base 
-        bg-red-500 text-white rounded-lg hover:bg-red-800 transition 
-        w-[7rem] sm:w-[8rem] md:w-[9rem]">
-    Preview PDF
-</button>
-
+                        <button onclick="previewPdf()" 
+                            class="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-xs sm:text-sm md:text-base 
+                                bg-red-500 text-white rounded-lg hover:bg-red-800 transition 
+                                w-[7rem] sm:w-[8rem] md:w-[9rem]">
+                            Preview PDF
+                        </button>
 
 
 
@@ -119,121 +118,80 @@
 
     <script>
       function previewPdf() {
-        fetch("{{ route('attendance.preview-pdf') }}")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.url) {
-                    window.open(data.url, '_blank');
-                } else {
-                    console.error("PDF URL not received");
-                }
-            })
-            .catch(error => console.error("Error loading PDF:", error));
-    }
+        window.open("{{ route('attendance.preview-pdf') }}", '_blank');
+      }
 
-    const videoElement = document.getElementById('video');
-const canvasElement = document.getElementById('canvas');
-const startCameraButton = document.getElementById('startCameraButton');
-const captureButton = document.getElementById('captureButton');
-const attendanceForm = document.getElementById('attendanceForm');
-const imageDataInput = document.getElementById('image_data');
-let stream = null;
+      const videoElement = document.getElementById('video');
+      const canvasElement = document.getElementById('canvas');
+      const startCameraButton = document.getElementById('startCameraButton');
+      const captureButton = document.getElementById('captureButton');
+      const attendanceForm = document.getElementById('attendanceForm');
+      const imageDataInput = document.getElementById('image_data');
+      let stream = null;
 
-// Start the camera when the button is clicked
-startCameraButton.addEventListener('click', () => {
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then((mediaStream) => {
-            stream = mediaStream;
-            videoElement.srcObject = stream;
-            videoElement.style.display = 'block'; // Show video element
-            attendanceForm.style.display = 'block'; // Show the form for taking attendance
-            startCameraButton.style.display = 'none'; // Hide the start camera button
-        })
-        .catch((error) => {
-            console.error("Error accessing webcam:", error);
-        });
-        
-});
+      // Set canvas size to match the video display size
+      canvasElement.width = 224;
+      canvasElement.height = 224;
 
-// Function to stop the webcam
-function stopWebcam() {
-    if (stream) {
-        const tracks = stream.getTracks(); // Get all media tracks
-        tracks.forEach((track) => track.stop()); // Stop each track
-        stream = null; // Clear the stream
-    }
-}
+      // Start the camera when the button is clicked
+      startCameraButton.addEventListener('click', () => {
+          navigator.mediaDevices.getUserMedia({ video: true })
+              .then((mediaStream) => {
+                  stream = mediaStream;
+                  videoElement.srcObject = stream;
+                  videoElement.style.display = 'block'; // Show video element
+                  attendanceForm.style.display = 'block'; // Show the form for taking attendance
+                  startCameraButton.style.display = 'none'; // Hide the start camera button
+              })
+              .catch((error) => {
+                  console.error("Error accessing webcam:", error);
+              });
+      });
 
-// Capture the photo when the button is clicked
-captureButton.addEventListener('click', function (event) {
-    event.preventDefault();
-    
-    const context = canvasElement.getContext('2d');
-    canvasElement.style.display = 'block';  // Show canvas for photo capture
-    context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-    
-    // Convert canvas image to data URL and set it in the hidden input
-    const imageData = canvasElement.toDataURL('image/png');
-    imageDataInput.value = imageData;  // Set the captured image as the form data
+      // Function to stop the webcam
+      function stopWebcam() {
+          if (stream) {
+              const tracks = stream.getTracks(); // Get all media tracks
+              tracks.forEach((track) => track.stop()); // Stop each track
+              stream = null; // Clear the stream
+          }
+      }
 
-    // Stop the webcam
-    stopWebcam();
+      // Capture the photo when the button is clicked
+      captureButton.addEventListener('click', function (event) {
+          event.preventDefault();
 
-    // Submit the form with the photo data
-    attendanceForm.submit(); 
-    
-});
+          const context = canvasElement.getContext('2d');
+          canvasElement.style.display = 'block';  // Show canvas for photo capture
+          context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
 
-document.addEventListener('DOMContentLoaded', function () {
-    const flashMessage = document.getElementById('flash-message');
-    if (flashMessage) {
-        setTimeout(() => {
-            flashMessage.style.opacity = '0';
-            setTimeout(() => flashMessage.remove(), 500); // Remove after fade out
-        }, 3000); // Show for 3 seconds
-    }
-});
+          // Convert canvas image to data URL and set it in the hidden input
+          const imageData = canvasElement.toDataURL('image/png');
+          imageDataInput.value = imageData;  // Set the captured image as the form data
 
-// Optional: Stop the webcam when the user navigates away from the page
-window.addEventListener('beforeunload', stopWebcam)
-document.getElementById('previewPdfBtn').addEventListener('click', function () {
-    const button = this;
-    const originalText = button.innerText;
-    button.innerText = 'Loading...';
-    button.disabled = true;
+          // Stop the webcam
+          stopWebcam();
 
-    fetch("{{ route('attendance.preview-pdf') }}")
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            if (data.success && data.url) {
-                window.open(data.url, '_blank');
-            } else {
-                alert("PDF generation failed. Please try again.");
-                console.error(data.message || 'Unknown error');
-            }
-        })
-        .catch(error => {
-            alert("An error occurred while generating the PDF.");
-            console.error("Preview PDF error:", error);
-        })
-        .finally(() => {
-            button.innerText = originalText;
-            button.disabled = false;
-        });
-});
+          // Submit the form with the photo data
+          attendanceForm.submit(); 
 
+      });
 
+      document.addEventListener('DOMContentLoaded', function () {
+          const flashMessage = document.getElementById('flash-message');
+          if (flashMessage) {
+              setTimeout(() => {
+                  flashMessage.style.opacity = '0';
+                  setTimeout(() => flashMessage.remove(), 500); // Remove after fade out
+              }, 3000); // Show for 3 seconds
+          }
+      });
+
+      // Optional: Stop the webcam when the user navigates away from the page
+      window.addEventListener('beforeunload', stopWebcam)
     </script>
 
- {{-- @vite('resources/js/attendance.js') --}}
+{{-- @vite('resources/js/attendance.js') --}}
 
 </div>
 @endsection

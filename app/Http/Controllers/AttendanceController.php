@@ -123,30 +123,23 @@ class AttendanceController extends Controller
     {
         try {
             $user = Auth::user();
-
+    
             $attendances = Attendance::where('user_id', $user->id)
                 ->with('user')
                 ->orderBy('date', 'desc')
                 ->get();
-
+    
             $pdf = Pdf::loadView('attendance.pdf', compact('attendances'));
-
-            $filename = 'attendance_records_' . $user->id . '_' . time() . '.pdf';
-            $pdfPath = 'attendance_reports/' . $filename;
-
-            // Save PDF to public storage
-            Storage::disk('public')->put($pdfPath, $pdf->output());
-
-            // Generate public URL
-            $url = Storage::url($pdfPath);
-
-            return response()->json([
-                'success' => true,
-                'url' => $url
-            ]);
+    
+            // Stream PDF directly to browser (inline display)
+            return $pdf->stream('attendance_report_' . $user->id . '.pdf');
+    
+            // If you want to force download, use:
+            // return $pdf->download('attendance_report_' . $user->id . '.pdf');
+    
         } catch (\Exception $e) {
             Log::error('PDF generation failed: ' . $e->getMessage());
-
+    
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to generate PDF.',
