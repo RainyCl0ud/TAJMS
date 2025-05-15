@@ -51,7 +51,6 @@
                             @endphp
                             <div class="relative flex items-center w-[70px] sm:w-[90px] h-10 sm:h-12 overflow-hidden">
                                 @foreach($displayImages as $index => $image)
-                                <pre>{{ $image }}</pre>
                                 <img src="{{ $image }}" 
      class="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-md border shadow-md"
      style="position: absolute; left: {{ $index * 14 }}px; z-index: {{ 5 - $index }};">
@@ -83,7 +82,6 @@
                 @endif
             </tbody>
         </table>
-        <pre>{{ $image }}</pre>
     </div>
 </div>
 

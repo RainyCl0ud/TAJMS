@@ -62,6 +62,12 @@ class JournalController extends Controller
         return view('journal.create', compact (('pageTitle')));
     }
 
+
+
+
+
+
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -102,6 +108,9 @@ class JournalController extends Controller
         return redirect()->route('journal.index')->with('success', 'Journal entry created successfully.');
     }
     
+
+
+
 
 
     public function update(Request $request, $id)
