@@ -151,7 +151,7 @@ class JournalController extends Controller
                         foreach ($images as $imageUrl) {
                             $imageData = @file_get_contents($imageUrl);
                             if ($imageData !== false) {
-                                $mimeType = (new finfo(FILEINFO_MIME_TYPE))->buffer($imageData);
+                                $mimeType = mime_content_type($imageUrl);
                                 $base64 = 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
                                 $journal->base64Images[] = $base64;
                             }
