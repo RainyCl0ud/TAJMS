@@ -28,8 +28,10 @@ WORKDIR /var/www
 # Copy application files
 COPY . /var/www/
 
-# Install dependencies
-RUN composer install --optimize-autoloader --no-dev
+# Install Google Client Library and other dependencies
+RUN composer require google/apiclient:^2.15.0 --no-scripts
+RUN composer install --optimize-autoloader --no-dev --no-scripts
+RUN composer dump-autoload --optimize
 RUN npm install && npm run build
 
 # Configure Nginx
@@ -50,6 +52,7 @@ EXPOSE 9000
 
 # Create start script
 RUN echo '#!/bin/bash\n\
+composer dump-autoload --optimize\n\
 php artisan migrate --force\n\
 php artisan db:seed --force\n\
 php artisan storage:link\n\
