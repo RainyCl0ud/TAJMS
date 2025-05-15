@@ -12,6 +12,13 @@ class RequestController extends Controller
 {
     public function index() 
     {
+        // Mark all notifications as read when coordinator views requests
+        if (auth()->user()->role === 'coordinator') {
+            \App\Models\Notification::whereHas('request', function ($query) {
+                $query->where('coordinator_id', auth()->id());
+            })->update(['read' => true]);
+        }
+
         $requests = Request::with('trainee')->latest()->get();
     
         foreach ($requests as $request) {

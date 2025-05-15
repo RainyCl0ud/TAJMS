@@ -13,99 +13,67 @@
     </div>
     <div class="flex items-center space-x-4 relative">
         @if(Auth::check() && Auth::user()->role === 'coordinator')
-        <!-- Notification Bell -->
-        <div class="relative" x-data="{ 
-            open: false,
-            notificationCount: 0,
-            notifications: [],
-            
-            init() {
-                this.fetchNotifications();
-                this.initializeEcho();
-            },
-
-            fetchNotifications() {
-                fetch('/api/notifications')
-                    .then(response => response.json())
-                    .then(data => {
-                        this.notifications = data.notifications;
-                        this.notificationCount = data.unread_count;
-                    });
-            },
-
-            initializeEcho() {
-                window.Echo.private('requests')
-                    .listen('NewRequestNotification', (e) => {
-                        this.notifications.unshift(e.notification);
-                        this.notificationCount++;
-                    });
-            },
-
-            markAsRead(notificationId) {
-                fetch('/api/notifications/mark-as-read', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
-                    },
-                    body: JSON.stringify({ notification_id: notificationId })
-                })
-                .then(() => {
-                    this.notificationCount = Math.max(0, this.notificationCount - 1);
-                });
-            }
-        }">
-            <button @click="open = !open" class="relative p-2 text-gray-600 hover:text-gray-800 focus:outline-none">
+        <!-- Notification Bell Dropdown -->
+        <div class="relative group">
+            <button class="relative p-2 text-gray-600 hover:text-gray-800 focus:outline-none">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                 </svg>
-                <!-- Notification Badge -->
-                <span x-show="notificationCount > 0" 
-                      x-text="notificationCount"
-                      class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center animate-pulse">
-                </span>
+                @php
+                    $unreadCount = \App\Models\Notification::where('read', false)
+                        ->whereHas('request', function ($query) {
+                            $query->where('coordinator_id', auth()->id());
+                        })->count();
+                @endphp
+                @if($unreadCount > 0)
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center animate-pulse">
+                        {{ $unreadCount }}
+                    </span>
+                @endif
             </button>
-            
-            <!-- Notification Dropdown -->
-            <div x-show="open" 
-                 @click.away="open = false"
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 transform scale-95"
-                 x-transition:enter-end="opacity-100 transform scale-100"
-                 x-transition:leave="transition ease-in duration-100"
-                 x-transition:leave-start="opacity-100 transform scale-100"
-                 x-transition:leave-end="opacity-0 transform scale-95"
-                 class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50">
+
+            <!-- Dropdown Content - Shows on Hover -->
+            <div class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50 hidden group-hover:block">
                 <div class="px-4 py-2 border-b border-gray-200">
                     <h3 class="text-sm font-semibold text-gray-700">Notifications</h3>
                 </div>
                 <div class="max-h-96 overflow-y-auto">
-                    <template x-if="notifications.length === 0">
+                    @php
+                        $notifications = \App\Models\Notification::with(['user', 'request'])
+                            ->whereHas('request', function ($query) {
+                                $query->where('coordinator_id', auth()->id());
+                            })
+                            ->orderBy('created_at', 'desc')
+                            ->take(10)
+                            ->get();
+                    @endphp
+
+                    @forelse($notifications as $notification)
+                        <a href="{{ route('coordinator.requests') }}" class="block">
+                            <div class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0">
+                                        <img class="h-10 w-10 rounded-full" 
+                                             src="{{ $notification->user->profile_picture ?? asset('storage/profile_pictures/default.png') }}" 
+                                             alt="{{ $notification->user->first_name }}">
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <p class="text-sm text-gray-900">
+                                            <span class="font-medium">{{ $notification->user->first_name }} {{ $notification->user->last_name }}</span>
+                                            requested a forgot 
+                                            {{ $notification->request->type === 'time_in' ? 'time in' : 'time out' }}
+                                            for {{ $notification->request->date }}
+                                        </p>
+                                        <p class="text-xs text-gray-500">{{ $notification->created_at->diffForHumans() }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    @empty
                         <div class="px-4 py-3 text-sm text-gray-500 text-center">
                             No new notifications
                         </div>
-                    </template>
-                    <template x-for="notification in notifications" :key="notification.id">
-                        <div class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100"
-                             @click="markAsRead(notification.id)">
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0">
-                                    <img class="h-10 w-10 rounded-full" 
-                                         :src="notification.user_image || '{{ asset('storage/profile_pictures/default.png') }}'" 
-                                         :alt="notification.user_name">
-                                </div>
-                                <div class="ml-3 flex-1">
-                                    <p class="text-sm text-gray-900">
-                                        <span class="font-medium" x-text="notification.user_name"></span> 
-                                        requested a forgot 
-                                        <span x-text="notification.type === 'time_in' ? 'time in' : 'time out'"></span>
-                                        for <span x-text="notification.date"></span>
-                                    </p>
-                                    <p class="text-xs text-gray-500" x-text="notification.created_at"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
+                    @endforelse
                 </div>
                 <div class="px-4 py-2 border-t border-gray-200">
                     <a href="{{ route('coordinator.requests') }}" class="text-sm text-blue-600 hover:text-blue-800">View all requests</a>
@@ -161,14 +129,32 @@
     </div>
 </header>
 
-<!-- Make sure Alpine.js is loaded -->
-<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-<!-- Make sure Laravel Echo is initialized -->
-<script>
-    window.addEventListener('load', function() {
-        if (typeof window.Echo === 'undefined') {
-            console.error('Laravel Echo is not initialized. Please check your broadcasting configuration.');
-        }
-    });
-</script>
+<style>
+    /* Ensure dropdown stays visible while hovering */
+    .group:hover .group-hover\:block {
+        display: block;
+    }
+    
+    /* Add transition for smooth hover effect */
+    .group-hover\:block {
+        transition: all 0.3s ease;
+    }
+    
+    /* Custom scrollbar for notifications */
+    .max-h-96::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .max-h-96::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .max-h-96::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 2px;
+    }
+    
+    .max-h-96::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
