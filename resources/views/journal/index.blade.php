@@ -57,9 +57,21 @@
     @endphp
     <div class="relative flex items-center w-[70px] sm:w-[90px] h-10 sm:h-12 overflow-hidden">
         @foreach($displayImages as $index => $image)
-            <img src="{{ $image }}" 
-                 class="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-md border shadow-md"
-                 style="position: absolute; left: {{ $index * 14 }}px; z-index: {{ 5 - $index }};">
+        @php
+    function getDriveImageUrl($url) {
+        if (preg_match('/\/d\/(.*?)\//', $url, $matches)) {
+            return 'https://drive.google.com/uc?export=view&id=' . $matches[1];
+        } elseif (preg_match('/id=([^&]+)/', $url, $matches)) {
+            return 'https://drive.google.com/uc?export=view&id=' . $matches[1];
+        }
+        return $url;
+    }
+@endphp
+
+<img src="{{ getDriveImageUrl($image) }}" 
+     class="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-md border shadow-md"
+     style="position: absolute; left: {{ $index * 14 }}px; z-index: {{ 5 - $index }};">
+
         @endforeach
 
         @if($totalImages > 3)
