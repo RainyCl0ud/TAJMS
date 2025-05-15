@@ -56,22 +56,9 @@
 </div>
 
 <script>
-    function previewPdf() {
-        fetch("{{ route('journal.preview-pdf') }}")
-            .then(response => response.json())
-            .then(data => {
-                if (data.url) {
-                    window.open(data.url, "_blank");
-                } else {
-                    alert("Error: No PDF URL found.");
-                }
-            })
-            .catch(error => {
-                console.error("Error loading PDF:", error);
-                alert("Failed to load PDF. Please try again.");
-            });
-    }
-
+function previewPdf() {
+    window.open("{{ route('journal.preview-pdf') }}", '_blank');
+}
     document.addEventListener('DOMContentLoaded', function () {
         const flashMessage = document.getElementById('flash-message');
         if (flashMessage) {

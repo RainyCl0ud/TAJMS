@@ -133,23 +133,36 @@ class JournalController extends Controller
 
     
 
-
-    public function previewPdf(): JsonResponse
+    public function previewPdf()
     {
-        $journals = Journal::with('user')->orderBy('created_at', 'desc')->get();
+        try {
+            $user = Auth::user();
     
-        // Generate the PDF in memory
-        $pdf = Pdf::loadView('journal.pdf', compact('journals'))
-                  ->setPaper('A4', 'portrait');
+            $journals = Journal::where('user_id', $user->id)
+                ->with('user')
+                ->orderBy('created_at', 'desc')
+                ->get();
     
-        // Encode PDF output as base64
-        $base64Pdf = base64_encode($pdf->output());
+            $pdf = Pdf::loadView('journal.pdf', compact('journals'))
+                ->setPaper('A4', 'portrait');
     
-        // Return a data URI that can be opened in a new tab
-        $dataUri = 'data:application/pdf;base64,' . $base64Pdf;
+            // Stream PDF directly to the browser
+            return $pdf->stream('journal_report_' . $user->id . '.pdf');
     
-        return response()->json(['url' => $dataUri]);
+            // For force download:
+            // return $pdf->download('journal_report_' . $user->id . '.pdf');
+    
+        } catch (\Exception $e) {
+            Log::error('Journal PDF generation failed: ' . $e->getMessage());
+    
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate Journal PDF.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+    
 
     }
 
