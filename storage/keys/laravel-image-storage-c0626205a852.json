@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "laravel-image-storage",
+  "private_key_id": "c0626205a8520e7ddb8535db4427ab2b98b16ade",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCzl+gXmuM5xya6\n4BoI+SGctUv1b7Mv8xoYfmU5p1DAYPZ6xfAIUN0XL83un0GN97w6/4YU6nS4LO1/\nmA4w95STBtsXDoD3zW+Nc45C1n4/RGffmpMVrpIKdzqLA6NI888AI9dMffDqppOr\nHiWNepZgZnCtoycjPuq1ypla6oFyIowSUkR8MALT+mHElXBVHS8/pBuUB/7QUjZ+\nHk6dO/GnQooTKkZvL18XVq/gPzVQ53wa9wJ9EoUPjP+tyWcRIecFeP2YD+aHJHNM\n25rS7jU4MAbSMPy9Xn0YrBWHs3Tz+jwkm7nmqor4LCF053AtkEht1dYKAn7Sx0vO\n8Ma6Kn8NAgMBAAECggEAIElg+k1oKEz7U4FSbOaM+mVFgJxSNH6Z5GlkvVatF8jW\nxv+qxXP0K2T2ur16xZESD/E8I6p6zVmWYOfvNTJtTXlgDecXnHUcZuutWarCC5G6\nsuJRKwa1Tphct/0xb74VKstGu4Owuh60UYEb8zFks3P3MeAw+w8mlwQTSdr65o+t\nlnKGw4QSeoJ155Gph3LQul9T+AWHG1aJ8bNQL034Sijf5uXZeZDlkYNN9zjanzKV\nCvkIBgOIjD5viMZ3l3c0kGt3ZXx1+QKR5z1Vkjo6xAtf6lWuu68jE2p9FTJL7bBc\nfis7nU++X/zEwhbhANse2BgTbMlGXbStnAJDxchFAQKBgQD2G1jxjOMlM8Wajixq\nbHXERn+ndMefjUnaujdwlP0gR9ka8cKx1XegJvCdz6J1SMH134qVLQYKRk4EeEgP\nnnuMdV0OgwVJokaHS2Ssz0ani9mpCsT9mHGGO8FrbIfUD1VeJoyykXo4jv4UCesR\npNAINviku86ukihgB87uP+J6oQKBgQC60BQF7fp5GWKHSbbUQf4FprR1s1xgdbXO\ns5QV/YIj5J99/1clXZEAdkSe5Q0sq8ayp2kPKf2mHeCOUzqsiVEMev0gpRoCEkRI\n4CZ5j7fIz57lPO+aH123Z653h7GfanuJVBB3p66y+ehKBUNPMy7lidhhIcZozji6\nItPNnNP47QKBgQDFltVFMdEYiEVpPiZo12WBzPwmbPrsnZojEwj5yZSkuyqSmHGx\nJ2rg2QKsIQ0UzvJyviPcewZzb1ip/AwXBi25amzo/sZbBP9NFnngyJW4ZO6+6leY\nJzFWDVnQLpWq6xil+5tQrr4K9LsHSaNCSil/vurID8TzoYLq/rnjzMS/oQKBgA5g\nAppuNI7rACTu7C2rIlPm/w3rjlkx1ZqhQOzsQ/5lEkzMwDT03TqO3zrm3zunwDNx\nJGlxTr5goC3zg5lRO7ZdJGtFqRmttClzbiJ+h6LhLxXuuXU/oqOBS/CQtX9R302y\n9U1vzsag6ln/y60lgB9Tmx3mTnE0JTNViLzSq5EFAoGAVrQHFrINPa/9w+U/tiMt\n7uTyrxM2cQoezKO4p/Pq67ewuJ6kgX+ZPPWZCaadTD2GEz0ClDhtE+wTaho15QjU\nkJeJJmoLpH5LnYtIYiOnwIZZbX2AB1xoDNdWMtKj+P/MYHxgR8F8itW75wgHSTor\nVn1MBpC2kmYmSjNOPgC1+WM=\n-----END PRIVATE KEY-----\n",
+  "client_email": "tajms-storage@laravel-image-storage.iam.gserviceaccount.com",
+  "client_id": "105431151975605669846",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/tajms-storage%40laravel-image-storage.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
