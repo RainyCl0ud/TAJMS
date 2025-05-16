@@ -63,7 +63,7 @@
                                       <div class="mt-6 flex justify-end space-x-4">
                                           <button onclick="closeModal({{ $user->id }})" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
 
-                                          <form method="POST" action="{{ route('promote', ['user' => $user->id]) }}">
+                                          <form method="POST" action="{{ route('coordinator.promote', ['user' => $user->id]) }}">
                                               @csrf
                                               <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Yes, Promote</button>
                                           </form>
