@@ -93,6 +93,9 @@ class RequestController extends Controller
     {
         $request = Request::findOrFail($id);
     
+        // Delete associated notifications first
+        Notification::where('request_id', $request->id)->delete();
+        
         // Optional: log or store status before deletion if needed
         $request->status = 'Rejected';
         $request->save();
@@ -103,10 +106,13 @@ class RequestController extends Controller
         return redirect()->back()->with('success', 'Request has been rejected and removed!');
     }
     
-
     public function delete($id)
     {
         $request = Request::findOrFail($id);
+        
+        // Delete associated notifications first
+        Notification::where('request_id', $request->id)->delete();
+        
         $request->delete();
 
         return redirect()->back()->with('success', 'Request has been deleted!');

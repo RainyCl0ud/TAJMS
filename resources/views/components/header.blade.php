@@ -73,8 +73,12 @@
                                         <p class="text-sm text-gray-900">
                                             <span class="font-medium">{{ $notification->user->first_name }} {{ $notification->user->last_name }}</span>
                                             requested a forgot 
-                                            {{ $notification->request->type === 'time_in' ? 'time in' : 'time out' }}
-                                            for {{ $notification->request->date }}
+                                            @if($notification->request)
+                                                {{ $notification->request->type === 'time_in' ? 'time in' : 'time out' }}
+                                                for {{ $notification->request->date }}
+                                            @else
+                                                time entry
+                                            @endif
                                         </p>
                                         <p class="text-xs text-gray-500">{{ $notification->created_at->diffForHumans() }}</p>
                                     </div>
