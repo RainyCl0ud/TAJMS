@@ -30,7 +30,6 @@ class DocumentController extends Controller
             'type' => 'required|string',
             'document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
-
         $type = $request->type;
         $file = $request->file('document');
 
