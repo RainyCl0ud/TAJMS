@@ -2,7 +2,7 @@
     <div class="flex items-center space-x-4">
         <!-- Hamburger Icon (Visible on Small Screens) -->
         <button id="menuToggle" class="text-gray-700 md:hidden focus:outline-none">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
             </svg>
         </button>
@@ -11,14 +11,16 @@
             {{ $pageTitle }}
         </h1>
     </div>
+
     <div class="flex items-center space-x-4 relative">
         @if(Auth::check() && Auth::user()->role === 'coordinator')
         <!-- Notification Bell Dropdown -->
         <div class="relative">
             <input type="checkbox" id="notification-toggle" class="hidden peer">
             <label for="notification-toggle" class="relative p-2 text-gray-600 hover:text-gray-800 focus:outline-none cursor-pointer">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                 </svg>
                 @php
                     $unreadCount = \App\Models\Notification::where('read', false)->count();
@@ -44,13 +46,28 @@
                     @endphp
 
                     @forelse($notifications as $notification)
+                        @php
+                            $url = $notification->user->profile_picture;
+                            $fileId = null;
+
+                            if (str_contains($url, 'id=')) {
+                                parse_str(parse_url($url, PHP_URL_QUERY), $query);
+                                $fileId = $query['id'] ?? null;
+                            } elseif (preg_match('/\/d\/(.*?)\//', $url, $matches)) {
+                                $fileId = $matches[1];
+                            }
+
+                            $imageUrl = $fileId ? "https://drive.google.com/thumbnail?id={$fileId}" : asset('storage/profile_pictures/default.png');
+                        @endphp
+
                         <a href="{{ route('coordinator.requests') }}" class="block">
                             <div class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
                                 <div class="flex items-start">
                                     <div class="flex-shrink-0">
-                                        <img class="h-10 w-10 rounded-full" 
-                                             src="{{ $notification->user->profile_picture ?? asset('storage/profile_pictures/default.png') }}" 
-                                             alt="{{ $notification->user->first_name }}">
+                                        <img class="h-10 w-10 rounded-full object-cover"
+                                             src="{{ $imageUrl }}"
+                                             alt="{{ $notification->user->first_name }}"
+                                             onerror="this.onerror=null;this.src='{{ asset('storage/profile_pictures/default.png') }}';">
                                     </div>
                                     <div class="ml-3 flex-1">
                                         <p class="text-sm text-gray-900">
@@ -78,36 +95,35 @@
         @endif
 
         <x-dropdown align="right" width="48">
-           <x-slot name="trigger">
-    @if(Auth::check())
-        @php
-            $url = Auth::user()->profile_picture;
-            $fileId = null;
+            <x-slot name="trigger">
+                @if(Auth::check())
+                    @php
+                        $url = Auth::user()->profile_picture;
+                        $fileId = null;
 
-            if (str_contains($url, 'id=')) {
-                parse_str(parse_url($url, PHP_URL_QUERY), $query);
-                $fileId = $query['id'] ?? null;
-            } elseif (preg_match('/\/d\/(.*?)\//', $url, $matches)) {
-                $fileId = $matches[1];
-            }
+                        if (str_contains($url, 'id=')) {
+                            parse_str(parse_url($url, PHP_URL_QUERY), $query);
+                            $fileId = $query['id'] ?? null;
+                        } elseif (preg_match('/\/d\/(.*?)\//', $url, $matches)) {
+                            $fileId = $matches[1];
+                        }
 
-            $finalImageUrl = $fileId ? "https://drive.google.com/thumbnail?id={$fileId}" : null;
-        @endphp
+                        $finalImageUrl = $fileId ? "https://drive.google.com/thumbnail?id={$fileId}" : asset('storage/profile_pictures/default.png');
+                    @endphp
 
-        <div class="flex items-center cursor-pointer">
-            <div class="text-gray-700 hidden md:flex flex-col ml-2">
-                <span class="text-sm">{{ ucfirst(Auth::user()->first_name . ' ' . Auth::user()->last_name) }}</span>
-                <span class="block text-xs text-gray-500">{{ Auth::user()->role }}</span>
-            </div>
+                    <div class="flex items-center cursor-pointer">
+                        <div class="text-gray-700 hidden md:flex flex-col ml-2">
+                            <span class="text-sm">{{ ucfirst(Auth::user()->first_name . ' ' . Auth::user()->last_name) }}</span>
+                            <span class="block text-xs text-gray-500">{{ Auth::user()->role }}</span>
+                        </div>
 
-            <img src="{{ $finalImageUrl ?? asset('storage/profile_pictures/default.png') }}"
-                 alt="{{ Auth::user()->first_name }}'s Profile Picture"
-                 class="h-10 w-10 rounded-full ml-2 object-cover cursor-pointer border border-black hover:shadow-lg hover:shadow-blue-300"
-                 onerror="this.onerror=null;this.src='{{ asset('storage/profile_pictures/default.png') }}'; console.error('Failed to load profile picture');">
-        </div>
-    @endif
-</x-slot>
-
+                        <img src="{{ $finalImageUrl }}"
+                             alt="{{ Auth::user()->first_name }}'s Profile Picture"
+                             class="h-10 w-10 rounded-full ml-2 object-cover cursor-pointer border border-black hover:shadow-lg hover:shadow-blue-300"
+                             onerror="this.onerror=null;this.src='{{ asset('storage/profile_pictures/default.png') }}';">
+                    </div>
+                @endif
+            </x-slot>
 
             <x-slot name="content">
                 <x-dropdown-link href="{{ route('profile.edit') }}">
@@ -125,35 +141,28 @@
 </header>
 
 <style>
-    /* Remove hover-related styles */
     .max-h-96::-webkit-scrollbar {
         width: 4px;
     }
-    
     .max-h-96::-webkit-scrollbar-track {
         background: #f1f1f1;
     }
-    
     .max-h-96::-webkit-scrollbar-thumb {
         background: #888;
         border-radius: 2px;
     }
-    
     .max-h-96::-webkit-scrollbar-thumb:hover {
         background: #555;
     }
-    
-    /* Ensure dropdown is always on top */
+
     .z-50 {
         z-index: 9999 !important;
     }
-    
-    /* Dashboard cards should have lower z-index */
+
     .dashboard-card {
         z-index: 10;
     }
 
-    /* Add transition for smooth toggle */
     .peer-checked\:block {
         transition: all 0.2s ease-in-out;
     }
