@@ -1,142 +1,119 @@
 @extends('layouts.app')
 @include('components.header')
-
 @section('content')
-<div class="bg-blue-100 flex flex-col p-10 overflow-y-auto max-h-screen pb-20">
 
-    <!-- Back Button -->
-    <div class="mb-6 flex justify-end">
-        <a href="{{ route('coordinator.pre_users') }}" 
-            class="px-4 py-2 bg-red-600 text-white hover:bg-blue-600 hover:shadow-black rounded-lg shadow-md flex items-center">
-            ← Go Back
-        </a>
-    </div>
- 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-20">
+<div class="container mx-auto p-6 h-screen bg-blue-100">
 
-        @foreach ([
-            'cor', 'medical', 'psa', 'insurance', 'consent', 
-            'waiver', 'mdr', 'resume', 'bio_data', 'letter', 'clearance', 'philhealth',
-        ] as $type)
-            @php
-                $document = $user->documents->where('document_type', $type)->first();
-                $documentLabels = [
-                    'cor' => 'Certificate of Registration',
-                    'medical' => 'Medical Certificate',
-                    'psa' => 'Birth Certificate', 
-                    'insurance' => 'Health Insurance',
-                    'consent' => 'Parent Consent',
-                    'waiver' => 'Waiver',
-                    'mdr' => 'Member Data Record',
-                    'resume' => 'Resume',
-                    'bio_data' => 'Bio Data',
-                    'letter' => 'Application Letter',
-                    'clearance' => 'Police Clearance',
-                    'philhealth' => 'PhilHealth ID',
-                ]; 
-                $formattedType = $documentLabels[$type] ?? ucwords(str_replace('_', ' ', $type));
+  @if(session('success') || session('error'))
+  <div id="flash-message" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-opacity-90 px-6 py-3 rounded-lg shadow-lg text-white text-lg font-semibold transition-opacity duration-500"
+       style="z-index: 9999; background-color: rgba(0, 0, 0, 0.8);">
+       {{ session('success') ?? session('error') }}
+  </div>
+  @endif
 
-                $docPath = $document?->document_path;
-                $isDrive = $docPath && str_contains($docPath, 'drive.google.com');
-                $fileId = null;
+  <div class="mb-6 flex">
+      <input type="text" id="search" placeholder="Search..." class="px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-1/2"/>
+      <a href="{{route('coordinator.dashboard')}}" class="back flex justify-between ml-auto bg-red-500 text-white p-2 rounded-lg hover:bg-blue-600 hover:shadow-black">←GO BACK</a>
+  </div>
+  
+  <div class="overflow-x-auto rounded-lg shadow-lg border border-black bg-white h-[450px] w-full">
+      <table class="min-w-full table-auto">
+          <thead class="bg-gray-800 text-white sticky top-0 z-10">
+              <tr>
+                  <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider min-w-[80px]">Student Name</th>
+                  <th class="px-6 py-3 text-center text-sm font-medium uppercase tracking-wider min-w-[80px]">Status</th>
+                  <th class="px-6 py-3 text-center text-sm font-medium uppercase tracking-wider min-w-[80px]">Action</th>
+              </tr>
+          </thead>
+          <tbody id="table-body">
+              @foreach ($preUsers as $user)
+              @php
+                  $requiredDocumentTypes = ['cor', 'medical', 'psa', 'insurance', 'consent', 'waiver', 'mdr', 'resume', 'bio_data', 'letter', 'clearance', 'philhealth'];
+                  $allApproved = collect($requiredDocumentTypes)->every(function ($type) use ($user) {
+                      $document = $user->documents->where('document_type', $type)->first();
+                      return $document && $document->status === 'approved';
+                  }); 
+                  $hasDocuments = $user->documents->isNotEmpty();
+              @endphp
+              <tr class="border-b cursor-pointer hover:bg-gray-200" onclick="window.location='{{ route('coordinator.user.documents', ['user' => $user->id]) }}'" data-name="{{ strtolower($user->first_name . ' ' .$user->last_name ) }}">
+                  <td class="px-6 py-4 whitespace-normal break-words max-w-xs">{{ $user->first_name}} {{$user->last_name}}</td>
+                  <td class="px-6 py-4 text-center">
+                      <span class="px-3 py-1 rounded-lg text-white {{ $allApproved ? 'bg-green-500' : ($hasDocuments ? 'bg-gray-400' : 'bg-gray-300') }}">
+                          {{ $allApproved ? 'Completed' : ($hasDocuments ? 'Pending' : 'No Documents') }}
+                      </span>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                      <div class="flex justify-center items-center">
+                          @if ($allApproved)
+                              <button onclick="event.stopPropagation(); openModal({{ $user->id }})" class="flex justify-center items-center">
+                                  <span class="hidden sm:inline px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-200">
+                                      Mark as Trainee ✅
+                                  </span>
+                                  <span class="sm:hidden text-blue-500">✅</span>
+                              </button>
+                          @elseif ($hasDocuments)
+                              <button class="px-4 py-2 bg-orange-400 text-white rounded cursor-default">
+                                  Pending ⏳
+                              </button>
+                          @else
+                              <button class="px-4 py-2 text-white rounded cursor-not-allowed" disabled>❌</button>
+                          @endif
+                      </div>
+                  </td>
+              </tr>
 
-                if ($isDrive) {
-                    if (str_contains($docPath, 'id=')) {
-                        parse_str(parse_url($docPath, PHP_URL_QUERY), $query);
-                        $fileId = $query['id'] ?? null;
-                    } elseif (preg_match('/\/d\/(.*?)\//', $docPath, $matches)) {
-                        $fileId = $matches[1];
-                    }
-                }
+              <!-- Promotion Modal -->
+              <div id="confirmModal-{{ $user->id }}" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+                  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+                      <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Trainee Promotion</h2>
+                      <p class="text-gray-600 mb-6">Are you sure you want to mark <strong>{{ $user->first_name }} {{ $user->last_name }}</strong> as a trainee?</p>
+                      <form method="POST" action="{{ route('promote', $user->id) }}">
+                          @csrf
+                          <div class="flex justify-end space-x-4">
+                              <button type="button" onclick="closeModal({{ $user->id }})" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</button>
+                              <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Confirm</button>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+              @endforeach
 
-                $viewerPath = $isDrive
-                    ? ($fileId ? "https://drive.google.com/file/d/{$fileId}/preview" : '')
-                    : ($docPath ? asset('storage/' . $docPath) : '');
-            @endphp
-
-            <div class="block rounded-lg shadow-lg p-6 border border-black text-center
-                {{ $document && $document->status === 'approved' ? 'bg-green-400' : 
-                   ($document && $document->status === 'rejected' ? 'bg-red-400' : 
-                   ($document && $document->status === 'pending' ? 'bg-yellow-200' : 'bg-gray-200')) }}">
-
-                <p class="text-sm text-black mb-2">
-                    {{ $document ? ($document->status === 'approved' ? '✅ Approved' : ($document->status === 'rejected' ? '❌ Rejected' : '⏳ Pending...')) : 'No document uploaded' }}
-                </p>
-
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ $formattedType }}</h3>
-
-                <button 
-                    @if ($document && $viewerPath)
-                        onclick="openModal('{{ $viewerPath }}', '{{ $formattedType }}', '{{ $document->id }}', '{{ $document->status }}')"
-                    @else
-                        disabled
-                    @endif
-                    class="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 hover:shadow-black {{ !$document ? 'opacity-50 cursor-not-allowed' : '' }}">
-                    View Document
-                </button>
-            </div>
-        @endforeach
-    </div>
-
-    <!-- Document Preview Modal -->
-    <div id="previewModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex justify-center items-center p-4">
-        <div class="bg-white rounded-lg shadow-lg max-w-lg sm:max-w-2xl lg:max-w-4xl w-full p-6 relative">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-xl">
-                ✖
-            </button>
-            <h2 id="modalTitle" class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 text-center"></h2>
-            <iframe id="documentViewer" class="w-full h-72 sm:h-80 bg-gray-100 rounded-lg overflow-auto" frameborder="0" allowfullscreen></iframe>
-            
-            <div class="mt-4 flex flex-col sm:flex-row justify-between gap-2">
-                <button id="approveButton" onclick="updateDocumentStatus('approved')" class="px-4 py-2 bg-green-600 text-white rounded-lg shadow-md w-full sm:w-auto">
-                    Approve
-                </button>
-                <button id="rejectButton" onclick="updateDocumentStatus('rejected')" class="px-4 py-2 bg-red-600 text-white rounded-lg shadow-md w-full sm:w-auto">
-                    Reject
-                </button>
-            </div>
-        </div>
-    </div>
+              @if ($preUsers->isEmpty())
+                  <tr>
+                      <td colspan="3" class="text-center py-4 text-gray-500">No Pre-Users found.</td>
+                  </tr>
+              @endif
+          </tbody>
+      </table>
+  </div>
 </div>
 
 <script>
-    let currentDocumentId;
-
-    function openModal(documentPath, documentTitle, documentId, status = '') {
-        if (!documentPath || !documentId) {
-            alert("No document available.");
-            return;
-        }
-
-        currentDocumentId = documentId;
-        document.getElementById('modalTitle').textContent = documentTitle;
-        document.getElementById('documentViewer').src = documentPath;
-
-        document.getElementById('previewModal').classList.remove('hidden');
-    }
-
-    function closeModal() {
-        document.getElementById('previewModal').classList.add('hidden');
-        document.getElementById('documentViewer').src = ''; // Reset iframe
-    }
-
-    function updateDocumentStatus(status) {
-        fetch(`/documents/update-status/${currentDocumentId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            },
-            body: JSON.stringify({ status }),
-        }).then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                alert('Failed to update document.');
-            }
-        }).catch(error => {
-            console.error("Error updating document:", error);
+    document.getElementById('search').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#table-body tr');
+        rows.forEach(row => {
+            const studentName = row.getAttribute('data-name');
+            row.style.display = studentName.includes(searchTerm) ? '' : 'none';
         });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const flashMessage = document.getElementById('flash-message');
+        if (flashMessage) {
+            setTimeout(() => {
+                flashMessage.style.opacity = '0';
+                setTimeout(() => flashMessage.remove(), 500);
+            }, 3000);
+        }
+    });
+
+    function openModal(userId) {
+        document.getElementById('confirmModal-' + userId).classList.remove('hidden');
+    }
+
+    function closeModal(userId) {
+        document.getElementById('confirmModal-' + userId).classList.add('hidden');
     }
 </script>
 @endsection

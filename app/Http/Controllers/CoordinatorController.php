@@ -41,6 +41,8 @@ class CoordinatorController extends Controller
         return view('coordinator.user-documents', compact('user', 'pageTitle'));
     }
 
+
+
     public function promoteToTrainee(User $user)
     {
     
@@ -55,6 +57,9 @@ class CoordinatorController extends Controller
     return back()->with('success', "{$user->name} has been successfully promoted to Trainee.");
 
     }
+
+
+    
 
     public function records($traineeId)
     {
