@@ -5,46 +5,56 @@
 
 @section('content')
 
-  <!-- Flash Messages -->
-  @if(session('success') || session('error'))
+@if(session('success') || session('error'))
   <div id="flash-message" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-opacity-90 px-6 py-3 rounded-lg shadow-lg text-white text-lg font-semibold transition-opacity duration-500"
       style="z-index: 9999; background-color: rgba(0, 0, 0, 0.8);">
       {{ session('success') ?? session('error') }}
   </div>
-  @endif
-  
+@endif
+
 <div class="container mx-auto px-4 py-6">
     <h1 class="text-2xl font-semibold text-gray-800 mb-6">Requests</h1>
 
-    <!-- Request Cards Container with lower z-index -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
         @foreach($requests as $request)
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer"
-             onclick="showRequestModal({{ json_encode($request) }})">
-            <div class="p-4">
-                <div class="flex items-center mb-4">
-                    <img src="{{ $request->user->profile_picture ?? asset('storage/profile_pictures/default.png') }}" 
-                         alt="Profile Picture" 
-                         class="w-10 h-10 rounded-full mr-4">
-                    <div>
-                        <h3 class="font-semibold text-gray-800">{{ $request->user->first_name }} {{ $request->user->last_name }}</h3>
-                        <p class="text-sm text-gray-500">{{ $request->time_elapsed }}</p>
+            @php
+                $url = $request->user->profile_picture;
+                $fileId = null;
+
+                if (str_contains($url, 'id=')) {
+                    parse_str(parse_url($url, PHP_URL_QUERY), $query);
+                    $fileId = $query['id'] ?? null;
+                } elseif (preg_match('/\/d\/(.*?)\//', $url, $matches)) {
+                    $fileId = $matches[1];
+                }
+
+                $imageUrl = $fileId ? "https://drive.google.com/thumbnail?id={$fileId}" : asset('storage/profile_pictures/default.png');
+            @endphp
+
+            <button class="text-left bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer w-full"
+                    onclick='showRequestModal(@json($request))'>
+                <div class="p-4">
+                    <div class="flex items-center mb-4">
+                        <img src="{{ $imageUrl }}" alt="Profile Picture" class="w-10 h-10 rounded-full mr-4 object-cover">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">{{ $request->user->first_name }} {{ $request->user->last_name }}</h3>
+                            <p class="text-sm text-gray-500">{{ $request->time_elapsed }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="text-gray-700"><span class="font-semibold">Type:</span> {{ ucfirst($request->type) }}</p>
+                        <p class="text-gray-700"><span class="font-semibold">Date:</span> {{ $request->date }}</p>
+                        <p class="text-gray-700"><span class="font-semibold">Time:</span> {{ $request->time }}</p>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <span class="px-4 py-2 rounded {{ $request->status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : ($request->status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800') }}">
+                            {{ $request->status }}
+                        </span>
                     </div>
                 </div>
-                
-                <div class="mb-4">
-                    <p class="text-gray-700"><span class="font-semibold">Type:</span> {{ ucfirst($request->type) }}</p>
-                    <p class="text-gray-700"><span class="font-semibold">Date:</span> {{ $request->date }}</p>
-                    <p class="text-gray-700"><span class="font-semibold">Time:</span> {{ $request->time }}</p>
-                </div>
-
-                <div class="flex justify-end">
-                    <span class="px-4 py-2 rounded {{ $request->status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : ($request->status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800') }}">
-                        {{ $request->status }}
-                    </span>
-                </div>
-            </div>
-        </div>
+            </button>
         @endforeach
     </div>
 </div>
@@ -59,13 +69,13 @@
                 </svg>
             </button>
         </div>
-        
+
         <div id="request-details-content" class="mt-4">
-            <!-- Content will be populated by JavaScript -->
+            <!-- JavaScript will fill this -->
         </div>
-        
+
         <div id="request-actions" class="mt-6 flex justify-end space-x-4">
-            <!-- Actions will be populated by JavaScript -->
+            <!-- JavaScript will fill this -->
         </div>
     </div>
 </div>
@@ -104,13 +114,27 @@
         const modal = document.getElementById('request-details-modal');
         const content = document.getElementById('request-details-content');
         const actions = document.getElementById('request-actions');
-        
+
+        // Handle Google Drive image logic
+        let profileUrl = request.user.profile_picture || '';
+        let fileId = null;
+
+        if (profileUrl.includes('id=')) {
+            const urlParams = new URLSearchParams(profileUrl.split('?')[1]);
+            fileId = urlParams.get('id');
+        } else {
+            const match = profileUrl.match(/\/d\/(.*?)\//);
+            fileId = match ? match[1] : null;
+        }
+
+        const imageUrl = fileId
+            ? `https://drive.google.com/thumbnail?id=${fileId}`
+            : `{{ asset('storage/profile_pictures/default.png') }}`;
+
         // Populate modal content
         content.innerHTML = `
             <div class="flex items-center mb-6">
-                <img src="${request.user.profile_picture || '{{ asset("storage/profile_pictures/default.png") }}'}" 
-                     alt="Profile Picture" 
-                     class="w-16 h-16 rounded-full mr-4">
+                <img src="${imageUrl}" alt="Profile Picture" class="w-16 h-16 rounded-full mr-4 object-cover border border-gray-300">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">${request.user.first_name} ${request.user.last_name}</h2>
                     <p class="text-gray-500">${request.time_elapsed}</p>
@@ -124,29 +148,24 @@
                 ${request.image ? `
                     <div class="mt-4">
                         <h3 class="font-semibold text-gray-700 mb-2">Attached Image:</h3>
-                        <img src="{{ asset('storage/') }}/${request.image}" alt="Request Image" class="max-w-full rounded-lg">
+                        <img src="{{ asset('storage') }}/${request.image}" alt="Request Image" class="max-w-full rounded-lg">
                     </div>
                 ` : ''}
             </div>
         `;
 
-        // Populate actions based on request status
-        if (request.status === 'Pending') {
-            actions.innerHTML = `
-                <button onclick="rejectRequest(${request.id})" class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">
-                    Reject
-                </button>
-                <button onclick="approveRequest(${request.id})" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
-                    Approve
-                </button>
-            `;
-        } else {
-            actions.innerHTML = `
-                <span class="px-6 py-2 rounded ${request.status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                    ${request.status}
-                </span>
-            `;
-        }
+        actions.innerHTML = request.status === 'Pending' ? `
+            <button onclick="rejectRequest(${request.id})" class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">
+                Reject
+            </button>
+            <button onclick="approveRequest(${request.id})" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+                Approve
+            </button>
+        ` : `
+            <span class="px-6 py-2 rounded ${request.status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                ${request.status}
+            </span>
+        `;
 
         modal.classList.remove('hidden');
     }
@@ -156,7 +175,6 @@
     }
 
     function approveRequest(requestId) {
-        // Show add hours modal and set the request ID
         document.getElementById('request_id').value = requestId;
         document.getElementById('add-hours-modal').classList.remove('hidden');
         closeRequestModal();
@@ -167,12 +185,12 @@
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = `{{ url('request/reject') }}/${requestId}`;
-            
+
             const csrfToken = document.createElement('input');
             csrfToken.type = 'hidden';
             csrfToken.name = '_token';
             csrfToken.value = document.querySelector('meta[name="csrf-token"]').content;
-            
+
             form.appendChild(csrfToken);
             document.body.appendChild(form);
             form.submit();
@@ -183,13 +201,13 @@
         document.getElementById('add-hours-modal').classList.add('hidden');
     }
 
-    // Set up the add hours form submission
-    document.getElementById('add-hours-form').addEventListener('submit', function(e) {
+    document.getElementById('add-hours-form').addEventListener('submit', function (e) {
         e.preventDefault();
         const requestId = document.getElementById('request_id').value;
         this.action = `{{ url('request/approve') }}/${requestId}`;
         this.submit();
     });
 </script>
+
 @include('components.forgot-time-modal')
 @endsection
