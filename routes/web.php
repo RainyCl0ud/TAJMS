@@ -92,8 +92,9 @@ Route::middleware('auth')->group(function () {
 
 
      // Approve/Reject Absent Requests
-     Route::post('/absent/{id}/approve', [RequestController::class, 'approveAbsent'])->name('absents.approve');
-     Route::post('/absent/{id}/reject', [RequestController::class, 'rejectAbsent'])->name('absents.reject');
+     Route::post('/requests/{id}/approve', [RequestController::class, 'approve'])->name('requests.approve');
+     Route::post('/requests/{id}/reject', [RequestController::class, 'reject'])->name('requests.reject');
+
  
      // View Absent Requests
      Route::get('/absents', [RequestController::class, 'showAbsentRequests'])->name('absents.index');
