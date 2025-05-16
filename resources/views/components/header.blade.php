@@ -14,8 +14,9 @@
     <div class="flex items-center space-x-4 relative">
         @if(Auth::check() && Auth::user()->role === 'coordinator')
         <!-- Notification Bell Dropdown -->
-        <div class="relative group">
-            <button class="relative p-2 text-gray-600 hover:text-gray-800 focus:outline-none">
+        <div class="relative">
+            <input type="checkbox" id="notification-toggle" class="hidden peer">
+            <label for="notification-toggle" class="relative p-2 text-gray-600 hover:text-gray-800 focus:outline-none cursor-pointer">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                 </svg>
@@ -27,10 +28,10 @@
                         {{ $unreadCount }}
                     </span>
                 @endif
-            </button>
+            </label>
 
-            <!-- Dropdown Content - Shows on Hover -->
-            <div class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50 hidden group-hover:block">
+            <!-- Dropdown Content -->
+            <div class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50 hidden peer-checked:block">
                 <div class="px-4 py-2 border-b border-gray-200">
                     <h3 class="text-sm font-semibold text-gray-700">Notifications</h3>
                 </div>
@@ -124,17 +125,7 @@
 </header>
 
 <style>
-    /* Ensure dropdown stays visible while hovering */
-    .group:hover .group-hover\:block {
-        display: block;
-    }
-    
-    /* Add transition for smooth hover effect */
-    .group-hover\:block {
-        transition: all 0.3s ease;
-    }
-    
-    /* Custom scrollbar for notifications */
+    /* Remove hover-related styles */
     .max-h-96::-webkit-scrollbar {
         width: 4px;
     }
@@ -153,12 +144,17 @@
     }
     
     /* Ensure dropdown is always on top */
-    .group-hover\:block {
+    .z-50 {
         z-index: 9999 !important;
     }
     
     /* Dashboard cards should have lower z-index */
     .dashboard-card {
         z-index: 10;
+    }
+
+    /* Add transition for smooth toggle */
+    .peer-checked\:block {
+        transition: all 0.2s ease-in-out;
     }
 </style>
