@@ -103,15 +103,15 @@
 </div>
 
 <!-- Full Screen Image Modal -->
-<div id="fullscreen-modal" class="fixed inset-0 z-[60] hidden" style="background-color: rgba(0, 0, 0, 0.9);">
-    <div class="absolute inset-0 flex items-center justify-center">
-        <button onclick="closeFullscreen()" class="absolute top-4 right-4 text-white hover:text-gray-300 z-[70]">
+<div id="fullscreen-modal" class="fixed inset-0 z-[9999]" style="background-color: rgba(0, 0, 0, 0.9);">
+    <div class="absolute inset-0 flex items-center justify-center z-[10000]">
+        <button onclick="closeFullscreen()" class="absolute top-4 right-4 text-white hover:text-gray-300 z-[10001]">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
         <img id="fullscreen-image" src="" alt="Full Screen Image" 
-             class="max-h-[90vh] max-w-[90vw] object-contain cursor-zoom-out"
+             class="max-h-[90vh] max-w-[90vw] object-contain cursor-zoom-out z-[10000]"
              onclick="closeFullscreen()">
     </div>
 </div>
@@ -128,13 +128,14 @@
         const modal = document.getElementById('fullscreen-modal');
         const image = document.getElementById('fullscreen-image');
         image.src = imageUrl;
-        modal.style.display = 'flex';  // Changed from removing 'hidden' class
+        modal.style.display = 'flex';
+        modal.style.position = 'fixed';  // Ensure fixed positioning
         document.body.style.overflow = 'hidden';
     }
 
     function closeFullscreen() {
         const modal = document.getElementById('fullscreen-modal');
-        modal.style.display = 'none';  // Changed from adding 'hidden' class
+        modal.style.display = 'none';
         document.body.style.overflow = '';
     }
 
