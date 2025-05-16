@@ -12,9 +12,10 @@
   </div>
 @endif
 
-<div class="container mx-auto px-4 py-6 h-screen flex flex-col">
+<div class="container mx-auto px-4 py-6 flex flex-col">
     <h1 class="text-2xl font-semibold text-gray-800 mb-6">Requests</h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10 overflow-y-auto flex-1">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
         @foreach($requests as $request)
             @php
                 $url = $request->user->profile_picture;
