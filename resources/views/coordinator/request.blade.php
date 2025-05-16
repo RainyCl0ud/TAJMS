@@ -11,10 +11,8 @@
       {{ session('success') ?? session('error') }}
   </div>
 @endif
-
 <div class="container mx-auto px-4 py-6">
     <h1 class="text-2xl font-semibold text-gray-800 mb-6">Requests</h1>
-
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
         @foreach($requests as $request)
             @php
@@ -154,7 +152,7 @@
             </div>
         `;
 
-        actions.innerHTML = request.status === 'Pending' ? `
+        actions.innerHTML = request.status === 'pending' ? `
             <button onclick="rejectRequest(${request.id})" class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">
                 Reject
             </button>
@@ -162,7 +160,7 @@
                 Approve
             </button>
         ` : `
-            <span class="px-6 py-2 rounded ${request.status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+            <span class="px-6 py-2 rounded ${request.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
                 ${request.status}
             </span>
         `;
