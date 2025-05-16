@@ -61,21 +61,6 @@
                       </div>
                   </td>
               </tr>
-
-              <!-- Promotion Modal -->
-              <div id="confirmModal-{{ $user->id }}" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
-                  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
-                      <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Trainee Promotion</h2>
-                      <p class="text-gray-600 mb-6">Are you sure you want to mark <strong>{{ $user->first_name }} {{ $user->last_name }}</strong> as a trainee?</p>
-                      <form method="POST" action="{{ route('promote', $user->id) }}">
-                          @csrf
-                          <div class="flex justify-end space-x-4">
-                              <button type="button" onclick="closeModal({{ $user->id }})" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</button>
-                              <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Confirm</button>
-                          </div>
-                      </form>
-                  </div>
-              </div>
               @endforeach
 
               @if ($preUsers->isEmpty())
@@ -86,6 +71,24 @@
           </tbody>
       </table>
   </div>
+
+  {{-- Promotion Modals outside the table --}}
+  @foreach ($preUsers as $user)
+  <div id="confirmModal-{{ $user->id }}" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+          <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Trainee Promotion</h2>
+          <p class="text-gray-600 mb-6">Are you sure you want to mark <strong>{{ $user->first_name }} {{ $user->last_name }}</strong> as a trainee?</p>
+          <form method="POST" action="{{ route('promote', $user->id) }}">
+              @csrf
+              <div class="flex justify-end space-x-4">
+                  <button type="button" onclick="closeModal({{ $user->id }})" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</button>
+                  <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Confirm</button>
+              </div>
+          </form>
+      </div>
+  </div>
+  @endforeach
+
 </div>
 
 <script>
