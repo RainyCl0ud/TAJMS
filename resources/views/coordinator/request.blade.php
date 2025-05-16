@@ -188,7 +188,8 @@
         if (confirm('Are you sure you want to reject this request?')) {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = `{{ url('request/reject') }}/${requestId}`;
+            form.action = `{{ url('requests') }}/${requestId}/reject`;
+
 
             const csrfToken = document.createElement('input');
             csrfToken.type = 'hidden';
@@ -204,9 +205,9 @@
     document.getElementById('add-hours-form').addEventListener('submit', function (e) {
         e.preventDefault();
         const requestId = document.getElementById('request_id').value;
-        this.action = `{{ url('request/approve') }}/${requestId}`;
+        this.action = `{{ url('requests') }}/${requestId}/approve`;
         this.submit();
-    });
+    }); 
 </script>
 
 @include('components.forgot-time-modal')
