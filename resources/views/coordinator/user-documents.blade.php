@@ -12,73 +12,97 @@
   @endif
 
   <div class="mb-6 flex">
-      <input type="text" id="search" placeholder="Search..." class="px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-1/2"/>
-      <a href="{{route('coordinator.dashboard')}}" class="back flex justify-between ml-auto bg-red-500 text-white p-2 rounded-lg hover:bg-blue-600 hover:shadow-black">←GO BACK</a>
+      <h2 class="text-2xl font-bold">{{ $pageTitle }}</h2>
+      <a href="{{route('coordinator.pre_users')}}" class="back flex justify-between ml-auto bg-red-500 text-white p-2 rounded-lg hover:bg-blue-600 hover:shadow-black">←GO BACK</a>
   </div>
   
   <div class="overflow-x-auto rounded-lg shadow-lg border border-black bg-white h-[450px] w-full">
       <table class="min-w-full table-auto">
           <thead class="bg-gray-800 text-white sticky top-0 z-10">
               <tr>
-                  <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider min-w-[80px]">Student Name</th>
+                  <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider min-w-[80px]">Document Type</th>
                   <th class="px-6 py-3 text-center text-sm font-medium uppercase tracking-wider min-w-[80px]">Status</th>
                   <th class="px-6 py-3 text-center text-sm font-medium uppercase tracking-wider min-w-[80px]">Action</th>
               </tr>
           </thead>
           <tbody id="table-body">
-              @foreach ($preUsers as $user)
               @php
                   $requiredDocumentTypes = ['cor', 'medical', 'psa', 'insurance', 'consent', 'waiver', 'mdr', 'resume', 'bio_data', 'letter', 'clearance', 'philhealth'];
+                  $documentLabels = [
+                      'cor' => 'Certificate of Registration',
+                      'medical' => 'Medical Certificate',
+                      'psa' => 'Birth Certificate', 
+                      'insurance' => 'Health Insurance',
+                      'consent' => 'Parent Consent',
+                      'waiver' => 'Waiver',
+                      'mdr' => 'Member Data Record',
+                      'resume' => 'Resume',
+                      'bio_data' => 'Bio Data',
+                      'letter' => 'Application Letter',
+                      'clearance' => 'Police Clearance',
+                      'philhealth' => 'PhilHealth ID',
+                  ];
                   $allApproved = collect($requiredDocumentTypes)->every(function ($type) use ($user) {
                       $document = $user->documents->where('document_type', $type)->first();
                       return $document && $document->status === 'approved';
                   }); 
                   $hasDocuments = $user->documents->isNotEmpty();
               @endphp
-              <tr class="border-b cursor-pointer hover:bg-gray-200" onclick="window.location='{{ route('coordinator.user.documents', ['user' => $user->id]) }}'" data-name="{{ strtolower($user->first_name . ' ' .$user->last_name ) }}">
-                  <td class="px-6 py-4 whitespace-normal break-words max-w-xs">{{ $user->first_name}} {{$user->last_name}}</td>
+              
+              @foreach ($requiredDocumentTypes as $type)
+              @php
+                  $document = $user->documents->where('document_type', $type)->first();
+                  $status = $document ? $document->status : 'not_uploaded';
+              @endphp
+              <tr class="border-b hover:bg-gray-200">
+                  <td class="px-6 py-4 whitespace-normal break-words max-w-xs">{{ $documentLabels[$type] }}</td>
                   <td class="px-6 py-4 text-center">
-                      <span class="px-3 py-1 rounded-lg text-white {{ $allApproved ? 'bg-green-500' : ($hasDocuments ? 'bg-gray-400' : 'bg-gray-300') }}">
-                          {{ $allApproved ? 'Completed' : ($hasDocuments ? 'Pending' : 'No Documents') }}
+                      <span class="px-3 py-1 rounded-lg text-white 
+                          {{ $status === 'approved' ? 'bg-green-500' : 
+                             ($status === 'pending' ? 'bg-orange-400' : 
+                             ($status === 'rejected' ? 'bg-red-500' : 'bg-gray-300')) }}">
+                          {{ ucfirst($status === 'not_uploaded' ? 'Not Uploaded' : $status) }}
                       </span>
                   </td>
                   <td class="px-6 py-4 text-center">
                       <div class="flex justify-center items-center">
-                          @if ($allApproved)
-                              <button onclick="event.stopPropagation(); openModal({{ $user->id }})" class="flex justify-center items-center">
-                                  <span class="hidden sm:inline px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-200">
-                                      Mark as Trainee ✅
-                                  </span>
-                                  <span class="sm:hidden text-blue-500">✅</span>
-                              </button>
-                          @elseif ($hasDocuments)
-                              <button class="px-4 py-2 bg-orange-400 text-white rounded cursor-default">
-                                  Pending ⏳
-                              </button>
+                          @if ($document)
+                              <a href="{{ $document->document_path }}" target="_blank" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-200">
+                                  View Document
+                              </a>
+                              @if ($document->status !== 'approved')
+                                  <button onclick="updateStatus('{{ $document->id }}', 'approved')" class="ml-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700">
+                                      Approve
+                                  </button>
+                              @endif
+                              @if ($document->status !== 'rejected')
+                                  <button onclick="updateStatus('{{ $document->id }}', 'rejected')" class="ml-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">
+                                      Reject
+                                  </button>
+                              @endif
                           @else
-                              <button class="px-4 py-2 text-white rounded cursor-not-allowed" disabled>❌</button>
+                              <span class="text-gray-500">No document uploaded</span>
                           @endif
                       </div>
                   </td>
               </tr>
               @endforeach
-
-              @if ($preUsers->isEmpty())
-                  <tr>
-                      <td colspan="3" class="text-center py-4 text-gray-500">No Pre-Users found.</td>
-                  </tr>
-              @endif
           </tbody>
       </table>
   </div>
 
-  {{-- Promotion Modals outside the table --}}
-  @foreach ($preUsers as $user)
+  @if ($allApproved)
+  <div class="mt-6 flex justify-center">
+      <button onclick="openModal({{ $user->id }})" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+          Mark as Trainee ✅
+      </button>
+  </div>
+
   <div id="confirmModal-{{ $user->id }}" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
       <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
           <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Trainee Promotion</h2>
           <p class="text-gray-600 mb-6">Are you sure you want to mark <strong>{{ $user->first_name }} {{ $user->last_name }}</strong> as a trainee?</p>
-          <form method="POST" action="{{ route('promote', $user->id) }}">
+          <form method="POST" action="{{ route('coordinator.promote', ['user' => $user->id]) }}">
               @csrf
               <div class="flex justify-end space-x-4">
                   <button type="button" onclick="closeModal({{ $user->id }})" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</button>
@@ -87,20 +111,10 @@
           </form>
       </div>
   </div>
-  @endforeach
-
+  @endif
 </div>
 
 <script>
-    document.getElementById('search').addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#table-body tr');
-        rows.forEach(row => {
-            const studentName = row.getAttribute('data-name');
-            row.style.display = studentName.includes(searchTerm) ? '' : 'none';
-        });
-    });
-
     document.addEventListener('DOMContentLoaded', function () {
         const flashMessage = document.getElementById('flash-message');
         if (flashMessage) {
@@ -118,5 +132,25 @@
     function closeModal(userId) {
         document.getElementById('confirmModal-' + userId).classList.add('hidden');
     }
+
+    function updateStatus(documentId, status) {
+        fetch(`/documents/update-status/${documentId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the document status.');
+        });
+    }
 </script>
+
 @endsection
