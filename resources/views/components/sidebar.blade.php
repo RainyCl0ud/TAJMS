@@ -111,14 +111,6 @@
                 <input type="file" name="image" id="fileInputForgot" class="hidden" accept="image/*">
             </div>
 
-            <!-- Image Preview with Zoom -->
-            <div id="previewContainer" class="mt-4 hidden">
-                <p class="text-sm font-semibold mb-1">Preview:</p>
-                <div class="overflow-hidden rounded-lg border w-full max-h-96">
-                    <img id="imagePreview" src="" alt="Uploaded Image Preview" class="transition-transform duration-300 transform hover:scale-150 cursor-zoom-in w-full h-auto object-contain">
-                </div>
-            </div>
-
             <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4 w-full">Submit Request</button>
         </form>
         <button onclick="closeForgotModal()" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-lg">✖</button>
@@ -171,8 +163,6 @@
         const dragDropContainer = document.getElementById(containerId);
         const fileInput = document.getElementById(inputId);
         const dragDropText = document.getElementById(textId);
-        const preview = document.getElementById('imagePreview');
-        const previewContainer = document.getElementById('previewContainer');
 
         dragDropContainer.addEventListener('click', () => fileInput.click());
 
@@ -190,25 +180,18 @@
         dragDropContainer.addEventListener('drop', (e) => {
             e.preventDefault();
             fileInput.files = e.dataTransfer.files;
-            handlePreview(fileInput, dragDropText, preview, previewContainer);
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                dragDropText.textContent = `File Selected: ${file.name}`;
+            }
         });
 
         fileInput.addEventListener('change', () => {
-            handlePreview(fileInput, dragDropText, preview, previewContainer);
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                dragDropText.textContent = `File Selected: ${file.name}`;
+            }
         });
-    }
-
-    function handlePreview(fileInput, dragDropText, preview, previewContainer) {
-        if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            dragDropText.textContent = `File Selected: ${file.name}`;
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                preview.src = e.target.result;
-                previewContainer.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
