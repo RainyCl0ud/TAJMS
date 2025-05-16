@@ -146,32 +146,22 @@
 
         // Populate modal content
         content.innerHTML = `
-            <div class="flex items-center mb-6">
-                <img src="${profileImageUrl}" alt="Profile Picture" class="w-16 h-16 rounded-full mr-4 object-cover border border-gray-300">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">${request.user.first_name} ${request.user.last_name}</h2>
-                    <p class="text-gray-500">${request.time_elapsed}</p>
+            ${requestImageUrl ? `
+                <div class="flex justify-center">
+                    <img src="${requestImageUrl}" alt="Request Image" class="max-w-full h-auto rounded-lg">
                 </div>
-            </div>
-            <div class="space-y-4">
-                <p class="text-gray-700"><span class="font-semibold">Type:</span> ${request.type}</p>
-                <p class="text-gray-700"><span class="font-semibold">Date:</span> ${request.date}</p>
-                <p class="text-gray-700"><span class="font-semibold">Time:</span> ${request.time}</p>
-                <p class="text-gray-700"><span class="font-semibold">Reason:</span> ${request.reason}</p>
-                ${requestImageUrl ? `
-                    <div class="mt-4">
-                        <h3 class="font-semibold text-gray-700 mb-2">Attached Image:</h3>
-                        <img src="${requestImageUrl}" alt="Request Image" class="max-w-full rounded-lg mx-auto">
-                    </div>
-                ` : ''}
-            </div>
+            ` : `
+                <div class="text-center text-gray-500 py-8">
+                    No image attached to this request
+                </div>
+            `}
         `;
 
         actions.innerHTML = request.status === 'pending' ? `
-            <button onclick="rejectRequest(${request.id})" class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">
+            <button onclick="rejectRequest(${request.id})" class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 transition duration-200">
                 Reject
             </button>
-            <button onclick="approveRequest(${request.id})" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+            <button onclick="approveRequest(${request.id})" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition duration-200">
                 Approve
             </button>
         ` : `
