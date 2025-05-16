@@ -148,8 +148,11 @@
         // Populate modal content
         content.innerHTML = `
             ${requestImageUrl ? `
-                <div class="flex justify-center">
-                    <img src="${requestImageUrl}" alt="Request Image" class="max-w-full h-auto rounded-lg">
+                <div class="flex justify-center overflow-hidden">
+                    <div class="relative group cursor-zoom-in">
+                        <img src="${requestImageUrl}" alt="Request Image" class="max-w-full h-auto rounded-lg transition-transform duration-300 transform group-hover:scale-150">
+                        <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                    </div>
                 </div>
             ` : `
                 <div class="text-center text-gray-500 py-8">
