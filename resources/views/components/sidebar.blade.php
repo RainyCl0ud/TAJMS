@@ -49,12 +49,14 @@
             @endif
 
             <li class="flex flex-col space-y-1 relative">
-                @if(auth()->user()->role === 'coordinator')
-                    <!-- Coordinator sees only a direct Request link -->
+                @if(auth()->user()->role === 'coordinator' || auth()->user()->role === 'pre_user')
+                    <!-- Coordinator and pre_user see only a direct Request link -->
+                    @if(auth()->user()->role === 'coordinator')
                     <a href="{{ route('coordinator.requests') }}" class="sideB block px-4 py-2 rounded {{ request()->routeIs('coordinator.requests') ? 'bg-blue-100' : '' }}">
                         <img src="{{ asset('images/journal.png') }}" alt="Request Icon" class="w-5 h-5 inline-block" />
                         Request
                     </a>
+                    @endif
                 @else
                     <!-- Trainee sees Request with dropdown -->
                     <a href="javascript:void(0);" onclick="toggleRequest();" class="sideB block px-4 py-2 rounded flex items-center space-x-3 transition-all duration-300 ease-in-out hover:bg-blue-100">
