@@ -88,7 +88,7 @@
                             @elseif ($isDrive && $thumbnailUrl)
                                 <img src="{{ $thumbnailUrl }}" class="w-full h-80 object-cover rounded-lg" alt="Uploaded document">
                             @else
-                                <img src="{{ asset('storage/' . $path) }}" class="w-full h-80 object-cover rounded-lg" alt="Uploaded document">
+                                <img src="{{ $path }}" class="w-full h-80 object-cover rounded-lg" alt="Uploaded document">
                             @endif
                         @else
                             <p class="text-gray-500">No document uploaded yet.</p>
