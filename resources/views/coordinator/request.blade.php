@@ -11,6 +11,7 @@
       {{ session('success') ?? session('error') }}
   </div>
 @endif
+
 <div class="container mx-auto px-4 py-6">
     <h1 class="text-2xl font-semibold text-gray-800 mb-6">Requests</h1>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
@@ -113,26 +114,40 @@
         const content = document.getElementById('request-details-content');
         const actions = document.getElementById('request-actions');
 
-        // Handle Google Drive image logic
+        // Extract profile picture from Google Drive
         let profileUrl = request.user.profile_picture || '';
-        let fileId = null;
-
+        let profileFileId = null;
         if (profileUrl.includes('id=')) {
             const urlParams = new URLSearchParams(profileUrl.split('?')[1]);
-            fileId = urlParams.get('id');
+            profileFileId = urlParams.get('id');
         } else {
             const match = profileUrl.match(/\/d\/(.*?)\//);
-            fileId = match ? match[1] : null;
+            profileFileId = match ? match[1] : null;
         }
-
-        const imageUrl = fileId
-            ? `https://drive.google.com/thumbnail?id=${fileId}`
+        const profileImageUrl = profileFileId
+            ? `https://drive.google.com/thumbnail?id=${profileFileId}`
             : `{{ asset('storage/profile_pictures/default.png') }}`;
+
+        // Extract request image from Google Drive
+        let requestImageUrl = '';
+        if (request.image) {
+            let requestFileId = null;
+            if (request.image.includes('id=')) {
+                const urlParams = new URLSearchParams(request.image.split('?')[1]);
+                requestFileId = urlParams.get('id');
+            } else {
+                const match = request.image.match(/\/d\/(.*?)\//);
+                requestFileId = match ? match[1] : null;
+            }
+            requestImageUrl = requestFileId
+                ? `https://drive.google.com/thumbnail?id=${requestFileId}`
+                : '';
+        }
 
         // Populate modal content
         content.innerHTML = `
             <div class="flex items-center mb-6">
-                <img src="${imageUrl}" alt="Profile Picture" class="w-16 h-16 rounded-full mr-4 object-cover border border-gray-300">
+                <img src="${profileImageUrl}" alt="Profile Picture" class="w-16 h-16 rounded-full mr-4 object-cover border border-gray-300">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">${request.user.first_name} ${request.user.last_name}</h2>
                     <p class="text-gray-500">${request.time_elapsed}</p>
@@ -143,10 +158,10 @@
                 <p class="text-gray-700"><span class="font-semibold">Date:</span> ${request.date}</p>
                 <p class="text-gray-700"><span class="font-semibold">Time:</span> ${request.time}</p>
                 <p class="text-gray-700"><span class="font-semibold">Reason:</span> ${request.reason}</p>
-                ${request.image ? `
+                ${requestImageUrl ? `
                     <div class="mt-4">
                         <h3 class="font-semibold text-gray-700 mb-2">Attached Image:</h3>
-                        <img src="{{ asset('storage') }}/${request.image}" alt="Request Image" class="max-w-full rounded-lg">
+                        <img src="${requestImageUrl}" alt="Request Image" class="max-w-full rounded-lg mx-auto">
                     </div>
                 ` : ''}
             </div>
@@ -193,10 +208,6 @@
             document.body.appendChild(form);
             form.submit();
         }
-    }
-
-    function closeAddHoursModal() {
-        document.getElementById('add-hours-modal').classList.add('hidden');
     }
 
     document.getElementById('add-hours-form').addEventListener('submit', function (e) {
