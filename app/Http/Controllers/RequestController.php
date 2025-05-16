@@ -92,11 +92,17 @@ class RequestController extends Controller
     public function reject($id)
     {
         $request = Request::findOrFail($id);
+    
+        // Optional: log or store status before deletion if needed
         $request->status = 'Rejected';
         $request->save();
-
-        return redirect()->back()->with('success', 'Request has been rejected!');
+    
+        // Delete the request from database
+        $request->delete();
+    
+        return redirect()->back()->with('success', 'Request has been rejected and removed!');
     }
+    
 
     public function delete($id)
     {
