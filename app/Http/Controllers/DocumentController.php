@@ -23,33 +23,36 @@ class DocumentController extends Controller
             'type' => 'required|string',
             'document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
-
-        // Check if there's an existing document for the given type
+    
         $existingDocument = Document::where('user_id', Auth::id())
             ->where('document_type', $request->type)
             ->first();
-
+    
         if ($existingDocument) {
-            // Delete the old document from storage
-            Storage::delete('public' . $existingDocument->document_path);
-
-            // Remove the old document record from the database
+            // Optionally delete from Google Drive by file ID if you store it
             $existingDocument->delete();
         }
-
-        // Store the new document
-        $path = $request->file('document')->store('document_images', 'public');
-
-        // Create a new document entry
+    
+        $file = $request->file('document');
+        $fileName = $file->getClientOriginalName();
+        $filePath = $file->storeAs('', $fileName, 'google'); // 'google' is the disk name
+    
+        // Extract file ID from the path
+        $googleDriveFileId = Storage::disk('google')->getMetadata($filePath)['path'] ?? null;
+    
+        // Create a shareable link (or thumbnail URL)
+        $publicUrl = "https://drive.google.com/file/d/{$googleDriveFileId}/view";
+    
         Document::create([
             'user_id' => Auth::id(),
             'document_type' => $request->type,
-            'document_path' => $path,
-            'status' => 'pending', // Set the new document status to pending
+            'document_path' => $publicUrl,
+            'status' => 'pending',
         ]);
-
+    
         return redirect()->route('pre_user.dashboard')->with('success', 'Document uploaded successfully!');
     }
+    
 
     public function updateStatus(Request $request, Document $document)
     {
