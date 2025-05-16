@@ -45,14 +45,32 @@
                       </span>
                   </td>
                   <td class="px-6 py-4 text-center">
-                      <div class="flex justify-center items-center">
+                      <div class="flex justify-center items-center space-x-2">
                           @if ($allApproved)
-                              <button onclick="openModal({{ $user->id }})" class="flex justify-center items-center">
-                                  <span class="hidden sm:inline px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-200">
+                              <!-- Button to open confirmation modal -->
+                              <button type="button" onclick="event.stopPropagation(); openModal({{ $user->id }})" class="flex justify-center items-center">
+                                  <span class="hidden sm:inline px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-200 cursor-pointer">
                                       Mark as Trainee ✅
                                   </span>
-                                  <span class="sm:hidden text-blue-500">✅</span>
+                                  <span class="sm:hidden text-blue-500 cursor-pointer">✅</span>
                               </button>
+
+                              <!-- Confirmation Modal -->
+                              <div id="confirmModal-{{ $user->id }}" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+                                  <div class="bg-white rounded-lg p-6 w-11/12 max-w-md shadow-lg relative">
+                                      <h2 class="text-lg font-semibold mb-4">Confirm Promotion</h2>
+                                      <p>Are you sure you want to promote <strong>{{ $user->first_name }} {{ $user->last_name }}</strong> to Trainee?</p>
+                                      <div class="mt-6 flex justify-end space-x-4">
+                                          <button onclick="closeModal({{ $user->id }})" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+
+                                          <form method="POST" action="{{ route('promote', ['user' => $user->id]) }}">
+                                              @csrf
+                                              <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Yes, Promote</button>
+                                          </form>
+                                      </div>
+                                      <button onclick="closeModal({{ $user->id }})" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">&times;</button>
+                                  </div>
+                              </div>
                           @elseif ($hasDocuments)
                               <button class="px-4 py-2 bg-orange-400 text-white rounded cursor-default">
                                   Pending ⏳
@@ -95,7 +113,6 @@
     });
 
     function openModal(userId) {
-        event.stopPropagation();
         document.getElementById('confirmModal-' + userId).classList.remove('hidden');
     }
 
@@ -103,4 +120,5 @@
         document.getElementById('confirmModal-' + userId).classList.add('hidden');
     }
 </script>
+
 @endsection
