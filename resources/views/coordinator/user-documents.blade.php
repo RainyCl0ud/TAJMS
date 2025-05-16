@@ -33,9 +33,25 @@
                     'letter' => 'Application Letter',
                     'clearance' => 'Police Clearance',
                     'philhealth' => 'PhilHealth ID',
-        
                 ]; 
                 $formattedType = $documentLabels[$type] ?? ucwords(str_replace('_', ' ', $type));
+
+                $docPath = $document?->document_path;
+                $isDrive = $docPath && str_contains($docPath, 'drive.google.com');
+                $fileId = null;
+
+                if ($isDrive) {
+                    if (str_contains($docPath, 'id=')) {
+                        parse_str(parse_url($docPath, PHP_URL_QUERY), $query);
+                        $fileId = $query['id'] ?? null;
+                    } elseif (preg_match('/\/d\/(.*?)\//', $docPath, $matches)) {
+                        $fileId = $matches[1];
+                    }
+                }
+
+                $viewerPath = $isDrive
+                    ? ($fileId ? "https://drive.google.com/file/d/{$fileId}/preview" : '')
+                    : ($docPath ? asset('storage/' . $docPath) : '');
             @endphp
 
             <div class="block rounded-lg shadow-lg p-6 border border-black text-center
@@ -50,8 +66,8 @@
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ $formattedType }}</h3>
 
                 <button 
-                    @if ($document)
-                        onclick="openModal('{{ asset('storage/' . $document->document_path) }}', '{{ $formattedType }}', '{{ $document->id }}', '{{ $document->status }}')"
+                    @if ($document && $viewerPath)
+                        onclick="openModal('{{ $viewerPath }}', '{{ $formattedType }}', '{{ $document->id }}', '{{ $document->status }}')"
                     @else
                         disabled
                     @endif
@@ -69,7 +85,7 @@
                 ✖
             </button>
             <h2 id="modalTitle" class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 text-center"></h2>
-            <iframe id="documentViewer" class="w-full h-72 sm:h-80 bg-gray-100 rounded-lg overflow-auto"></iframe>
+            <iframe id="documentViewer" class="w-full h-72 sm:h-80 bg-gray-100 rounded-lg overflow-auto" frameborder="0" allowfullscreen></iframe>
             
             <div class="mt-4 flex flex-col sm:flex-row justify-between gap-2">
                 <button id="approveButton" onclick="updateDocumentStatus('approved')" class="px-4 py-2 bg-green-600 text-white rounded-lg shadow-md w-full sm:w-auto">
@@ -101,6 +117,7 @@
 
     function closeModal() {
         document.getElementById('previewModal').classList.add('hidden');
+        document.getElementById('documentViewer').src = ''; // Reset iframe
     }
 
     function updateDocumentStatus(status) {
@@ -111,8 +128,15 @@
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
             },
             body: JSON.stringify({ status }),
-        }).then(response => response.ok ? location.reload() : alert('Failed to update document.'))
-          .catch(error => console.error("Error updating document:", error));
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Failed to update document.');
+            }
+        }).catch(error => {
+            console.error("Error updating document:", error);
+        });
     }
 </script>
 @endsection
