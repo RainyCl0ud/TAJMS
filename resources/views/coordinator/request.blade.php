@@ -103,17 +103,13 @@
 </div>
 
 <!-- Full Screen Image Modal -->
-<div id="fullscreen-modal" class="fixed inset-0 z-[9999]" style="background-color: rgba(0, 0, 0, 0.9);">
-    <div class="absolute inset-0 flex items-center justify-center z-[10000]">
-        <button onclick="closeFullscreen()" class="absolute top-4 right-4 text-white hover:text-gray-300 z-[10001]">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-        </button>
-        <img id="fullscreen-image" src="" alt="Full Screen Image" 
-             class="max-h-[90vh] max-w-[90vw] object-contain cursor-zoom-out z-[10000]"
-             onclick="closeFullscreen()">
-    </div>
+<div id="fullscreen-modal" class="fixed inset-0 bg-black bg-opacity-90 hidden z-[60] flex items-center justify-center">
+    <button onclick="closeFullscreen()" class="absolute top-4 right-4 text-white hover:text-gray-300 text-xl">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+    </button>
+    <img id="fullscreen-image" src="" alt="Full Screen Image" class="max-h-screen max-w-screen p-4 cursor-zoom-out">
 </div>
 
 <script>
@@ -128,15 +124,14 @@
         const modal = document.getElementById('fullscreen-modal');
         const image = document.getElementById('fullscreen-image');
         image.src = imageUrl;
-        modal.style.display = 'flex';
-        modal.style.position = 'fixed';  // Ensure fixed positioning
-        document.body.style.overflow = 'hidden';
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
     }
 
     function closeFullscreen() {
         const modal = document.getElementById('fullscreen-modal');
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
+        modal.classList.add('hidden');
+        document.body.style.overflow = ''; // Restore scrolling
     }
 
     function showRequestModal(request) {
@@ -178,12 +173,14 @@
         content.innerHTML = `
             ${requestImageUrl ? `
                 <div class="flex justify-center overflow-hidden">
-                    <div class="relative group cursor-pointer" onclick="openFullscreen('${requestImageUrl}')">
+                    <div class="relative group">
                         <img src="${requestImageUrl}" 
                              alt="Request Image" 
-                             class="max-w-full h-auto rounded-lg transition-all duration-300 hover:opacity-90">
-                        <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300">
-                            <svg class="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transform scale-50 group-hover:scale-100 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             class="max-w-full h-auto rounded-lg transition-transform duration-300 transform cursor-pointer hover:opacity-90"
+                             onclick="openFullscreen('${requestImageUrl}')"
+                        >
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
                             </svg>
                         </div>
@@ -247,7 +244,7 @@
         this.submit();
     });
 
-    // Add event listeners for fullscreen modal
+    // Add ESC key listener to close fullscreen
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeFullscreen();
