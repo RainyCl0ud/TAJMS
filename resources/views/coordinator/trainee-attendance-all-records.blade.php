@@ -11,10 +11,10 @@
                 Forgot Time In/Out Requests
             </div>
             <!-- Table Wrapper -->
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto table-container">
                 <div class="max-h-[450px] overflow-y-auto">
                     <table class="min-w-full bg-white text-xs sm:text-sm md:text-base">
-                        <thead class="bg-gray-800 text-white sticky top-0 z-10">
+                        <thead class="bg-gray-800 text-white sticky top-0 z-20">
                             <tr>
                                 <th class="px-4 py-3 text-left font-medium uppercase tracking-wider">Name</th>
                                 <th class="px-4 py-3 text-left font-medium uppercase tracking-wider">Status</th>
@@ -25,7 +25,7 @@
                             <tr class="border-b cursor-pointer hover:bg-gray-100" 
                                 onclick="window.location.href='{{ route('coordinator.trainee-records', ['traineeId' => $trainee->id, 'from' => request()->fullUrl()]) }}'">
                                 <td class="px-4 py-3 whitespace-nowrap">
-                                    {{ $trainee->last_name . ' ' . $trainee->first_name . ', ' . substr($trainee->middle_name, 0, 1) . '.' }}
+                                    {{ Str::title($trainee->last_name . ' ' . $trainee->first_name . ', ' . substr($trainee->middle_name, 0, 1) . '.') }}
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <span class="px-3 py-1 text-xs sm:text-sm rounded-lg text-white {{ $trainee->attendance_status === 'Present' ? 'bg-green-500' : 'bg-red-500' }}">

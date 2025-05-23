@@ -17,7 +17,7 @@
     <a href="{{ route('journal.create') }}" class="bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 transition duration-300 text-sm sm:text-base">
         Create New Journal Entry
     </a>
-    <button onclick="previewPdf()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm sm:text-base">
+    <button onclick="previewPdf()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-gray-600 transition text-sm sm:text-base">
         Preview PDF
     </button>
 </div>

@@ -12,13 +12,31 @@ class Attendance extends Model
         'date',
         'in_time',
         'out_time',
+        'rendered_hours',
         'image',
     ];
 
     protected $casts = [
         'in_time' => 'datetime',
         'out_time' => 'datetime',
+        'rendered_hours' => 'decimal:2'
     ];
+
+    public function calculateRenderedHours()
+    {
+        if (!$this->in_time || !$this->out_time) {
+            return 0;
+        }
+
+        $minutes = $this->in_time->diffInMinutes($this->out_time);
+        
+        // Deduct 1 hour break if work duration is more than 5 hours
+        if ($minutes > 300) { // 5 hours * 60 minutes
+            $minutes -= 60; // Deduct 60 minutes for break
+        }
+        
+        return round($minutes / 60, 2);
+    }
    
     public function getStatusAttribute()
     {
@@ -49,13 +67,8 @@ class Attendance extends Model
         return 'Error';
     }
       
-    
-      
-    
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-    
-
 }

@@ -1,4 +1,5 @@
-<header class="h-20 flex justify-between items-center m-0 border-b-2 border-gray-300 px-6 shadow-lg sticky top-0 bg-white overlow-auto z-40">
+@php use Illuminate\Support\Str; @endphp
+<header class="h-20 flex justify-between items-center m-0 border-b-2 border-gray-300 px-6 shadow-lg sticky top-0 bg-white overlow-auto relative" style="z-index: 40;">
     <div class="flex items-center space-x-4">
         <!-- Hamburger Icon (Visible on Small Screens) -->
         <button id="menuToggle" class="text-gray-700 md:hidden focus:outline-none">
@@ -12,12 +13,11 @@
         </h1>
     </div>
 
-    <div class="flex items-center space-x-4 relative">
+    <div class="flex items-center space-x-4">
         @if(Auth::check() && Auth::user()->role === 'coordinator')
         <!-- Notification Bell Dropdown -->
-        <div class="relative">
-            <input type="checkbox" id="notification-toggle" class="hidden peer">
-            <label for="notification-toggle" class="relative p-2 text-gray-600 hover:text-gray-800 focus:outline-none cursor-pointer">
+        <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open" class="relative p-2 text-gray-600 hover:text-gray-800 focus:outline-none cursor-pointer">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
@@ -30,14 +30,23 @@
                         {{ $unreadCount }}
                     </span>
                 @endif
-            </label>
+            </button>
 
             <!-- Dropdown Content -->
-            <div class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50 hidden peer-checked:block">
-                <div class="px-4 py-2 border-b border-gray-200">
-                    <h3 class="text-sm font-semibold text-gray-700">Notifications</h3>
+            <div x-show="open" 
+                 @click.away="open = false"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="transform opacity-0 scale-95"
+                 x-transition:enter-end="transform opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-75"
+                 x-transition:leave-start="transform opacity-100 scale-100"
+                 x-transition:leave-end="transform opacity-0 scale-95"
+                 class="absolute right-0 w-[32rem] bg-white rounded-lg shadow-xl"
+                 style="top: calc(100% + 0.5rem); z-index: 100;">
+                <div class="bg-gray-50 px-4 py-3 border-b border-gray-200 rounded-t-lg">
+                    <h3 class="text-sm font-semibold text-gray-800">Notifications</h3>
                 </div>
-                <div class="max-h-96 overflow-y-auto">
+                <div class="max-h-[calc(100vh-200px)] overflow-y-auto">
                     @php
                         $notifications = \App\Models\Notification::with(['user', 'request'])
                             ->orderBy('created_at', 'desc')
@@ -60,39 +69,49 @@
                             $imageUrl = $fileId ? "https://drive.google.com/thumbnail?id={$fileId}" : asset('storage/profile_pictures/default.png');
                         @endphp
 
-                        <a href="{{ route('coordinator.requests') }}" class="block">
-                            <div class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
-                                <div class="flex items-start">
-                                    <div class="flex-shrink-0">
-                                        <img class="h-10 w-10 rounded-full object-cover"
-                                             src="{{ $imageUrl }}"
-                                             alt="{{ $notification->user->first_name }}"
-                                             onerror="this.onerror=null;this.src='{{ asset('storage/profile_pictures/default.png') }}';">
-                                    </div>
-                                    <div class="ml-3 flex-1">
-                                        <p class="text-sm text-gray-900">
-                                            <span class="font-medium">{{ $notification->user->first_name }} {{ $notification->user->last_name }}</span>
-                                            requested a forgot 
-                                            @if($notification->request)
-                                                {{ $notification->request->type === 'time_in' ? 'time in' : 'time out' }}
-                                                for {{ $notification->request->date }}
-                                            @else
-                                                time entry
-                                            @endif
-                                        </p>
-                                        <p class="text-xs text-gray-500">{{ $notification->created_at->diffForHumans() }}</p>
+                        <div class="hover:bg-gray-50 transition-colors duration-150 border-b border-gray-100 last:border-b-0">
+                            <a href="{{ route('coordinator.requests', ['highlight' => $notification->request->id]) }}" class="block">
+                                <div class="px-4 py-3">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="flex-shrink-0 w-10 h-10">
+                                            <img class="h-full w-full rounded-full object-cover border border-gray-200"
+                                                 src="{{ $imageUrl }}"
+                                                 alt="{{ $notification->user->first_name }}'s profile picture"
+                                                 onerror="this.src='{{ asset('storage/profile_pictures/default.png') }}'"
+                                                 loading="lazy">
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex justify-between items-start">
+                                                <p class="text-sm text-gray-900 font-medium truncate">
+                                                    {{ $notification->user->first_name }} {{ $notification->user->last_name }}
+                                                </p>
+                                                <p class="text-xs text-gray-500 ml-2 whitespace-nowrap">{{ $notification->created_at->diffForHumans() }}</p>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mt-1 break-words">
+                                                Requested a time 
+                                                @if($notification->request)
+                                                    {{ $notification->request->type === 'time_in' ? 'in' : 'out' }}
+                                                    entry for {{ \Carbon\Carbon::parse($notification->request->date)->format('M d, Y') }}
+                                                @else
+                                                    entry
+                                                @endif
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     @empty
-                        <div class="px-4 py-3 text-sm text-gray-500 text-center">
+                        <div class="px-4 py-6 text-sm text-gray-500 text-center">
                             No new notifications
                         </div>
                     @endforelse
                 </div>
-                <div class="px-4 py-2 border-t border-gray-200">
-                    <a href="{{ route('coordinator.requests') }}" class="text-sm text-blue-600 hover:text-blue-800">View all requests</a>
+                <div class="bg-gray-50 px-4 py-3 border-t border-gray-200 rounded-b-lg">
+                    <a href="{{ route('coordinator.requests') }}" 
+                       class="block text-sm text-center font-medium text-blue-600 hover:text-blue-800 transition-colors duration-150">
+                        View all requests
+                    </a>
                 </div>
             </div>
         </div>
@@ -117,7 +136,7 @@
 
                     <div class="flex items-center cursor-pointer">
                         <div class="text-gray-700 hidden md:flex flex-col ml-2">
-                            <span class="text-sm">{{ ucfirst(Auth::user()->first_name . ' ' . Auth::user()->last_name) }}</span>
+                            <span class="text-sm">{{ Str::title(Auth::user()->first_name . ' ' . Auth::user()->last_name) }}</span>
                             <span class="block text-xs text-gray-500">{{ Auth::user()->role }}</span>
                         </div>
 

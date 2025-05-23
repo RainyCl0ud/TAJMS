@@ -17,9 +17,9 @@
       <a href="{{route('coordinator.dashboard')}}" class="back flex justify-between ml-auto bg-red-500 text-white p-2 rounded-lg hover:bg-blue-600 hover:shadow-black">←GO BACK</a>
   </div>
   
-  <div class="overflow-x-auto rounded-lg shadow-lg border border-black bg-white h-[450px] w-full">
+  <div class="overflow-x-auto rounded-lg shadow-lg border border-black bg-white h-[450px] w-full table-container">
       <table class="min-w-full table-auto">
-          <thead class="bg-gray-800 text-white sticky top-0 z-10">
+          <thead class="bg-gray-800 text-white sticky top-0 z-20">
               <tr>
                   <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider min-w-[80px]">Student Name</th>
                   <th class="px-6 py-3 text-center text-sm font-medium uppercase tracking-wider min-w-[80px]">Status</th>

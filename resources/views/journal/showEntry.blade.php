@@ -6,7 +6,7 @@
     <div class="flex-1 overflow-y-auto p-5 max-h-[calc(100vh-64px)] sm:max-h-[calc(100vh-80px)]">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <div class="relative w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-5xl mx-auto bg-yellow-100 shadow-lg rounded-lg p-6 min-h-[30rem] border border-gray-200 shadow-black px-4 sm:px-6 md:px-8 px-4 lg:px-10 overflow-y-auto">
+        <div class="relative w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-5xl mx-auto bg-gray-100 shadow-lg rounded-lg p-6 min-h-[30rem] border border-gray-200 shadow-black px-4 sm:px-6 md:px-8 px-4 lg:px-10 overflow-y-auto">
 
             <!-- Header Section -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 mb-4 space-y-3 sm:space-y-0 relative">

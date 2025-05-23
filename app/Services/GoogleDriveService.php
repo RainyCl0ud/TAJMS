@@ -106,6 +106,11 @@ class GoogleDriveService
                 throw new \RuntimeException('Google Drive service not properly initialized: ' . $this->initializationError);
             }
 
+            // Verify file exists and is readable
+            if (!file_exists($filePath) || !is_readable($filePath)) {
+                throw new \RuntimeException('File does not exist or is not readable: ' . $filePath);
+            }
+
             $filename = $originalName ?: uniqid('profile_', true);
     
             $fileMetadata = new Google_Service_Drive_DriveFile([
@@ -113,6 +118,13 @@ class GoogleDriveService
                 'parents' => [env('GOOGLE_DRIVE_FOLDER_ID', '1jK02cuiyp3q93-A8aDqje7KIcWq7lebP')]
             ]);
     
+            // Log the upload attempt
+            logger()->info('Attempting to upload file to Google Drive', [
+                'filename' => $filename,
+                'mime_type' => $mimeType,
+                'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID', '1jK02cuiyp3q93-A8aDqje7KIcWq7lebP')
+            ]);
+
             $file = $this->driveService->files->create($fileMetadata, [
                 'data' => file_get_contents($filePath),
                 'mimeType' => $mimeType,
@@ -126,20 +138,29 @@ class GoogleDriveService
             $permission->setRole('reader');
             $this->driveService->permissions->create($file->id, $permission);
     
-            logger()->info('Uploaded to Google Drive with ID: ' . $file->id);
+            logger()->info('Successfully uploaded to Google Drive', [
+                'file_id' => $file->id,
+                'filename' => $filename
+            ]);
     
             // Return a web-viewable URL instead of download URL
             return "https://drive.google.com/uc?export=view&id=" . $file->id;
+        } catch (\Google\Service\Exception $e) {
+            logger()->error('Google Drive API error', [
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'errors' => $e->getErrors()
+            ]);
+            throw new \RuntimeException('Google Drive API error: ' . $e->getMessage());
         } catch (\Exception $e) {
-            logger()->error('File upload failed: ' . $e->getMessage());
-            logger()->error('Upload error details: ' . json_encode([
+            logger()->error('File upload failed', [
                 'file_path' => $filePath,
                 'mime_type' => $mimeType,
                 'original_name' => $originalName,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
-            ]));
-            return null;
+            ]);
+            throw new \RuntimeException('File upload failed: ' . $e->getMessage());
         }
     }
     

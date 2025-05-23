@@ -1,6 +1,6 @@
 <!-- Sidebar -->
 <aside id="sidebar"
-    class="fixed left-0 top-0 z-50 w-64 h-screen bg-blue-50 text-black flex flex-col pt-0 text-left shadow-lg border-r-2 border-gray-100 transition-transform transform -translate-x-full md:translate-x-0 md:relative">
+    class="fixed left-0 top-0 z-40 w-64 h-screen bg-blue-50 text-black flex flex-col pt-0 text-left shadow-lg border-r-2 border-gray-100 transition-transform transform -translate-x-full md:translate-x-0 md:relative">
     
     <!-- Close Button (Only for Small Screens) -->
     <button id="closeSidebar" class="absolute top-4 right-4 text-gray-700 md:hidden">
@@ -68,6 +68,9 @@
                         <button onclick="openForgotModal()" class="block pl-5 text-sm text-blue-500 hover:text-black mb-3 w-full text-left transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:opacity-80">
                             Forgot time in/out request
                         </button>
+                        <button onclick="openManualAttendanceModal()" class="block pl-5 text-sm text-blue-500 hover:text-black mb-3 w-full text-left transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:opacity-80">
+                            Manual attendance request
+                        </button>
                     </div>
                 @endif
             </li>
@@ -76,48 +79,126 @@
 </aside>
 
 <!-- Forgot Time In/Out Request Modal -->
-<div id="forgotTimeModal" class="hidden z-50 fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 p-4">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl relative opacity-0 transition-opacity duration-500 ease-in-out sm:max-w-lg md:max-w-xl lg:max-w-2xl" id="modalContentForgotTime">
-        <h3 class="text-xl font-bold mb-4 text-center">Forgot time in/out Request</h3>
-        
-        <form method="POST" action="{{ route('request.store') }}" enctype="multipart/form-data">
-            @csrf
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="flex flex-col">
-                    <label for="type" class="text-sm font-semibold mb-1">Type</label>
-                    <select name="type" id="type" class="w-full border p-2 rounded-lg" required>
-                        <option value="time_in">Time In</option>
-                        <option value="time_out">Time Out</option>
-                    </select>
+<div id="forgotTimeModal" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 9999;">
+    <!-- Modal Backdrop -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+    
+    <!-- Modal Content -->
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl relative opacity-0 transition-opacity duration-500 ease-in-out sm:max-w-lg md:max-w-xl lg:max-w-2xl" id="modalContentForgotTime">
+            <h3 class="text-xl font-bold mb-4 text-center">Forgot time in/out Request</h3>
+            
+            <form method="POST" action="{{ route('request.store') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col">
+                        <label for="type" class="text-sm font-semibold mb-1">Type</label>
+                        <select name="type" id="type" class="w-full border p-2 rounded-lg" required>
+                            <option value="time_in">Time In</option>
+                            <option value="time_out">Time Out</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="date" class="text-sm font-semibold mb-1">Date</label>
+                        <input type="date" name="date" id="date" class="w-full border p-2 rounded-lg" required max="{{ date('Y-m-d') }}">
+                    </div>
                 </div>
-                <div class="flex flex-col">
-                    <label for="date" class="text-sm font-semibold mb-1">Date</label>
-                    <input type="date" name="date" id="date" class="w-full border p-2 rounded-lg" required>
+
+                <div class="flex flex-col mt-4">
+                    <label for="time" class="text-sm font-semibold mb-1">Time</label>
+                    <input type="time" name="time" id="time" class="w-full border p-2 rounded-lg" required>
                 </div>
-            </div>
 
-            <div class="flex flex-col mt-4">
-                <label for="time" class="text-sm font-semibold mb-1">Time</label>
-                <input type="time" name="time" id="time" class="w-full border p-2 rounded-lg" required>
-            </div>
+                <div class="mt-4">
+                    <label for="reason" class="text-sm font-semibold mb-1">Reason</label>
+                    <textarea name="reason" id="reason" class="w-full border p-2 rounded-lg" rows="4" placeholder="Reason..." required></textarea>
+                </div>
 
-            <div class="mt-4">
-                <label for="reason" class="text-sm font-semibold mb-1">Reason</label>
-                <textarea name="reason" id="reason" class="w-full border p-2 rounded-lg" rows="4" placeholder="Reason..." required></textarea>
-            </div>
+                <!-- Drag and Drop Upload -->
+                <div class="mt-4">
+                    <label for="image" class="block text-sm font-semibold mb-1">Upload Image</label>
+                    <div id="drag-drop-container-forgot" class="border-2 border-dashed p-4 rounded-lg flex justify-center items-center cursor-pointer hover:border-blue-400">
+                        <p class="text-gray-600 text-center" id="drag-drop-text-forgot">Drag & Drop your file here or Click to select</p>
+                        <input type="file" name="image" id="fileInputForgot" class="hidden" accept="image/*">
+                    </div>
+                </div>
 
-            <!-- Drag and Drop Upload -->
-            <label for="image" class="block text-sm font-semibold mb-1 mt-4">Upload Image</label>
-            <div id="drag-drop-container-forgot" class="border-2 border-dashed p-4 rounded-lg flex justify-center items-center cursor-pointer hover:border-blue-400">
-                <p class="text-gray-600 text-center" id="drag-drop-text-forgot">Drag & Drop your file here or Click to select</p>
-                <input type="file" name="image" id="fileInputForgot" class="hidden" accept="image/*">
-            </div>
-
-            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4 w-full">Submit Request</button>
-        </form>
-        <button onclick="closeForgotModal()" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-lg">✖</button>
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4 w-full hover:bg-blue-600 transition-colors">Submit Request</button>
+            </form>
+            <button onclick="closeForgotModal()" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-lg">✖</button>
+        </div>
     </div>
 </div>
+
+<!-- Manual Attendance Request Modal -->
+<div id="manualAttendanceModal" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 9999;">
+    <!-- Modal Backdrop -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+    
+    <!-- Modal Content -->
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl relative opacity-0 transition-opacity duration-500 ease-in-out sm:max-w-lg md:max-w-xl lg:max-w-2xl" id="modalContentManualAttendance">
+            <h3 class="text-xl font-bold mb-4 text-center">Manual Attendance Request</h3>
+            
+            <form method="POST" action="{{ route('request.store') }}" enctype="multipart/form-data" onsubmit="return validateManualAttendance(event)">
+                @csrf
+                <input type="hidden" name="type" value="manual_attendance">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col">
+                        <label for="manual_date" class="text-sm font-semibold mb-1">Date</label>
+                        <input type="date" name="date" id="manual_date" class="w-full border p-2 rounded-lg" required 
+                               max="{{ date('Y-m-d') }}">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <div class="flex flex-col">
+                        <label for="time_in" class="text-sm font-semibold mb-1">Time In</label>
+                        <input type="time" name="time" id="time_in" class="w-full border p-2 rounded-lg" required>
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="time_out" class="text-sm font-semibold mb-1">Time Out</label>
+                        <input type="time" name="time_out" id="time_out" class="w-full border p-2 rounded-lg" required>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <label for="manual_reason" class="text-sm font-semibold mb-1">Reason</label>
+                    <textarea name="reason" id="manual_reason" class="w-full border p-2 rounded-lg" rows="4" 
+                              placeholder="Please explain why you need to submit a manual attendance..." required></textarea>
+                </div>
+
+                <!-- Drag and Drop Upload -->
+                <div class="mt-4">
+                    <label for="manual_image" class="block text-sm font-semibold mb-1">Upload DTR/Logbook Image <span class="text-red-500">*</span></label>
+                    <div id="drag-drop-container-manual" class="border-2 border-dashed p-4 rounded-lg flex justify-center items-center cursor-pointer hover:border-blue-400">
+                        <p class="text-gray-600 text-center" id="drag-drop-text-manual">Drag & Drop your DTR/Logbook image or Click to select</p>
+                        <input type="file" name="image" id="fileInputManual" class="hidden" accept="image/*" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4 w-full hover:bg-blue-600 transition-colors">Submit Request</button>
+            </form>
+            <button onclick="closeManualAttendanceModal()" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-lg">✖</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    #manualAttendanceModal {
+        isolation: isolate;
+    }
+    #manualAttendanceModal .bg-black {
+        z-index: -1;
+    }
+    #forgotTimeModal {
+        isolation: isolate;
+    }
+    #forgotTimeModal .bg-black {
+        z-index: -1;
+    }
+</style>
 
 <script>
     function toggleRequest() {
@@ -161,6 +242,55 @@
         }, 200);
     }
 
+    function openManualAttendanceModal() {
+        var modal = document.getElementById('manualAttendanceModal');
+        var modalContent = document.getElementById('modalContentManualAttendance');
+        modal.classList.remove('hidden');
+        setTimeout(function () {
+            modalContent.classList.remove('opacity-0');
+            modalContent.classList.add('opacity-100');
+        }, 10);
+    }
+
+    function closeManualAttendanceModal() {
+        var modal = document.getElementById('manualAttendanceModal');
+        var modalContent = document.getElementById('modalContentManualAttendance');
+        modalContent.classList.remove('opacity-100');
+        modalContent.classList.add('opacity-0');
+        setTimeout(function () {
+            modal.classList.add('hidden');
+        }, 200);
+    }
+
+    function validateManualAttendance(event) {
+        const dateInput = document.getElementById('manual_date');
+        const timeInInput = document.getElementById('time_in');
+        const timeOutInput = document.getElementById('time_out');
+        
+        // Check if date is not in the future
+        const selectedDate = new Date(dateInput.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (selectedDate > today) {
+            alert('Cannot submit attendance for future dates.');
+            event.preventDefault();
+            return false;
+        }
+        
+        // Check if time out is after time in
+        const timeIn = timeInInput.value;
+        const timeOut = timeOutInput.value;
+        
+        if (timeOut <= timeIn) {
+            alert('Time out must be after time in.');
+            event.preventDefault();
+            return false;
+        }
+        
+        return true;
+    }
+
     function setupDragDrop(containerId, inputId, textId) {
         const dragDropContainer = document.getElementById(containerId);
         const fileInput = document.getElementById(inputId);
@@ -198,5 +328,6 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         setupDragDrop('drag-drop-container-forgot', 'fileInputForgot', 'drag-drop-text-forgot');
+        setupDragDrop('drag-drop-container-manual', 'fileInputManual', 'drag-drop-text-manual');
     });
 </script>

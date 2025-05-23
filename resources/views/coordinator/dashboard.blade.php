@@ -16,7 +16,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             <!-- Total Users Box -->
-            <div class="dashboard-card bg-purple-500 text-white rounded-lg shadow-lg p-6 relative overflow-hidden">
+            <div class="dashboard-card bg-purple-500 text-white rounded-lg shadow-lg p-6 relative overflow-hidden z-0">
                 <div class="flex justify-between items-center">
                     <div>
                         <h1 class="text-xl font-semibold">Total Users</h1>
@@ -30,7 +30,7 @@
             </div>
 
             <!-- Pre-Users Box -->
-            <a class="dashboard-card bg-blue-500 text-white rounded-lg shadow-lg p-6 relative overflow-hidden cursor-pointer transition-all duration-500 transform hover:scale-110 hover:bg-blue-700"
+            <a class="dashboard-card bg-blue-500 text-white rounded-lg shadow-lg p-6 relative overflow-hidden cursor-pointer transition-all duration-500 transform hover:scale-110 hover:bg-blue-700 z-0"
                href="{{ route('coordinator.pre_users') }}">
                 <div class="flex justify-between items-center">
                     <div>
@@ -45,7 +45,7 @@
             </a>
 
             <!-- Trainees Box -->
-            <a class="dashboard-card bg-green-500 text-white rounded-lg shadow-lg p-6 relative overflow-hidden cursor-pointer transition-all duration-500 transform hover:scale-110 hover:bg-green-700"
+            <a class="dashboard-card bg-green-500 text-white rounded-lg shadow-lg p-6 relative overflow-hidden cursor-pointer transition-all duration-500 transform hover:scale-110 hover:bg-green-700 z-0"
                href="{{ route('coordinator.trainees') }}">
                 <div class="flex justify-between items-center">
                     <div>

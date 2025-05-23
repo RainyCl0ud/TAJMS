@@ -91,8 +91,15 @@ class CoordinatorController extends Controller
                 if ($attendance->in_time->gt($attendance->out_time)) {
                     return $carry; // Skip invalid time entries
                 }
-                // Add the positive difference between out_time and in_time
-                $carry += $attendance->in_time->diffInMinutes($attendance->out_time);
+                // Calculate minutes for this attendance
+                $minutes = $attendance->in_time->diffInMinutes($attendance->out_time);
+                
+                // Deduct 1 hour break if work duration is more than 5 hours
+                if ($minutes > 300) { // 5 hours * 60 minutes
+                    $minutes -= 60; // Deduct 60 minutes for break
+                }
+                
+                $carry += $minutes;
             }
             return $carry;
         }, 0);
@@ -184,50 +191,6 @@ class CoordinatorController extends Controller
     
         return view('coordinator.trainee-journal-entry', compact('journal', 'pageTitle', 'trainee', 'day'));
     }    
-
-
-    public function addRenderedHours(Request $request, $traineeId)
-    {
-        // Find the trainee by their ID
-        $trainee = User::findOrFail($traineeId);
-    
-        // Check if the trainee has any attendance records
-        $attendance = $trainee->attendance()->first();
-    
-        $additionalMinutes = ($request->hours * 60) + $request->minutes;
-
-        if ($attendance) {
-            // Calculate the current accumulated time if in_time and out_time exist
-            $currentMinutes = 0;
-            if ($attendance->in_time && $attendance->out_time) {
-                $currentMinutes = $attendance->in_time->diffInMinutes($attendance->out_time);
-            }
-    
-            // Add the manually provided hours and minutes
-            $totalMinutes = $currentMinutes + $additionalMinutes;
-    
-            // Add the total minutes to the in_time to calculate the new out_time
-            if ($attendance->in_time) {
-                $newOutTime = $attendance->in_time->addMinutes($totalMinutes);
-                $attendance->out_time = $newOutTime;
-                $attendance->save();
-            } else {
-                return redirect()->back()->with('error', 'No in-time recorded for this trainee.');
-            }
-        } else {
-            // If no attendance record exists, create a new one
-            $attendance = new Attendance();
-            $attendance->user_id = $traineeId;
-            $attendance->date = now()->toDateString(); // Set today's date
-            $attendance->in_time = now(); // Set in_time to current time (or another value as needed)
-            $attendance->out_time = now()->addMinutes($additionalMinutes); // Calculate out_time
-            $attendance->save();
-        }
-    
-        return redirect()->back()->with('success', 'Rendered hours added successfully!');
-    }
-    
-    
 }
 
 

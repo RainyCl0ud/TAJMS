@@ -13,10 +13,10 @@
 
    @unless($journals->isEmpty())
    <!-- Journal Entries Table -->
-   <div class="overflow-hidden rounded-lg shadow-lg border border-black shadow-lg shadow-black">
+   <div class="overflow-hidden rounded-lg shadow-lg border border-black shadow-lg shadow-black table-container">
        <div class="max-h-[calc(100vh-20rem)] sm:max-h-[calc(100vh-15rem)] overflow-auto">
            <table class="w-full text-xs sm:text-sm md:text-base relative">
-               <thead class="bg-gray-800 text-white sticky top-0 z-10">
+               <thead class="bg-gray-800 text-white sticky top-0 z-20">
                    <tr>
                        <th class="px-2 sm:px-4 py-3 text-left font-medium whitespace-nowrap">Day</th>
                        <th class="px-2 sm:px-4 py-3 text-left font-medium whitespace-nowrap">Journal</th>

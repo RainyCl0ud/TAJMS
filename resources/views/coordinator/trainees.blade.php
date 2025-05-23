@@ -50,7 +50,7 @@
                                 {{ $user->trainee->student_id }}
                             </td>
                             <td class="px-4 py-2 whitespace-nowrap truncate max-w-xs" style="max-width: 50px; overflow: hidden; text-overflow: ellipsis;">
-                                {{ $user->first_name . ' ' . $user->middle_name . ' ' . $user->last_name }}
+                                {{ Str::title($user->first_name . ' ' . $user->middle_name . ' ' . $user->last_name) }}
                             </td>
                             <td class="px-4 py-2 whitespace-nowrap truncate max-w-xs" style="max-width: 50px; overflow: hidden; text-overflow: ellipsis;">
                                 {{ $user->email }}

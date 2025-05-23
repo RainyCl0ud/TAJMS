@@ -17,9 +17,9 @@
     <p class="text-xs sm:text-sm text-gray-500 mb-4">&#x24D8; Recent attendance records</p>
 
     {{-- Table with responsive text size --}}
-    <div class="overflow-x-auto rounded-lg">
+    <div class="overflow-x-auto rounded-lg table-container">
         <table class="table-auto min-w-full border-collapse text-xs sm:text-sm md:text-base">
-            <thead class="sticky top-0 bg-gray-800 text-white">
+            <thead class="sticky top-0 bg-gray-800 text-white z-20">
                 <tr>
                     <th class="px-2 sm:px-4 py-2 text-left">Day</th>
                     <th class="px-2 sm:px-4 py-2 text-left">Date</th>

@@ -2,6 +2,8 @@
 @include('components.header')
 @section('content')
 
+@php use Illuminate\Support\Str; @endphp
+
 <div class="max-h-screen overflow-auto">
     <div class="flex-1 px-6 py-4 pb-20">
  
@@ -14,7 +16,7 @@
         <div class="grid sm:grid-cols-2 gap-1 items-center">
             <!-- Trainee Details -->
             <div>
-           <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ $trainee->first_name }} {{ $trainee->middle_name }} {{ $trainee->last_name }}</h2>
+           <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ Str::title($trainee->first_name . ' ' . $trainee->middle_name . ' ' . $trainee->last_name) }}</h2>
            <div class="space-y-1">
                <p class="text-gray-600"><span class="font-semibold">Student ID:</span> {{ $trainee->trainee->student_id }}</p>
                <p class="text-gray-600"><span class="font-semibold">Email:</span> {{ $trainee->email }}</p>
@@ -30,10 +32,6 @@
                     <p class="text-xs font-semibold text-gray-600">Remaining Hours</p>
                     <p class="text-xl font-bold text-red-500">{{ $remainingHours }}h & {{ $remainingMins }}m</p>
                 </div>
-                <!-- Add Rendered Hours Button -->
-                <button onclick="openAddHoursModal()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
-                    ➕ Add Rendered Hours 
-                </button>
             </div>
         </div>
     </div>
@@ -129,33 +127,6 @@
         <p class="text-gray-500 text-center">No attendance records available.</p>
     @endif
 </div>
-
-
-<!-- Modal for Adding Rendered Hours -->
-<div id="addHoursModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex justify-center items-center">
-    <div class="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
-        <button onclick="closeAddHoursModal()" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900">✖</button>
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Add Rendered Hours</h2>
-
-        <form action="{{ route('coordinator.addRenderedHours', $trainee->id) }}" method="POST">
-            @csrf
-            <label class="block text-gray-700 font-medium">Hours</label>
-            <input type="number" name="hours" class="w-full p-2 border rounded-lg mb-3" min="0" required>
-
-            <label class="block text-gray-700 font-medium">Minutes</label>
-            <input type="number" name="minutes" class="w-full p-2 border rounded-lg mb-3" min="0" max="59" required>
-
-            <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg">
-                Add Hours
-            </button>
-        </form>
-    </div>
-</div>
-
-<script>
-    function openAddHoursModal() { document.getElementById('addHoursModal').classList.remove('hidden'); }
-    function closeAddHoursModal() { document.getElementById('addHoursModal').classList.add('hidden'); }
-</script>
     </div>
     </div>
 </div>

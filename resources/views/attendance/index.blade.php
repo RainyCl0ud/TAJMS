@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @include('components.header')
+@php use Illuminate\Support\Str; @endphp
 @section('content')
 <div class="pl-5 pr-5">
     <!-- Page Header -->
@@ -7,7 +8,7 @@
         <h2 class="text-lg sm:text-2xl md:text-3xl font-bold text-black bg-yellow-100 
         p-3 shadow-black shadow-md rounded-lg 
         text-center sm:text-left w-auto max-w-full sm:max-w-lg break-words">
- {{$trainee->first_name .' '.$trainee->middle_name.' '. $trainee->last_name}}
+{{ Str::title($trainee->first_name . ' ' . $trainee->middle_name . ' ' . $trainee->last_name) }}
 </h2>
 
         <button onclick="window.history.back()"  class="mt-3 sm:mt-0 px-3 sm:px-4 py-1 sm:py-2 bg-red-500 text-white 
