@@ -70,7 +70,7 @@
                         @endphp
 
                         <div class="hover:bg-gray-50 transition-colors duration-150 border-b border-gray-100 last:border-b-0">
-                            <a href="{{ route('coordinator.requests', ['highlight' => $notification->request->id]) }}" class="block">
+                            <a href="{{ $notification->request ? route('coordinator.requests', ['highlight' => $notification->request->id]) : route('coordinator.requests') }}" class="block">
                                 <div class="px-4 py-3">
                                     <div class="flex items-start space-x-3">
                                         <div class="flex-shrink-0 w-10 h-10">
