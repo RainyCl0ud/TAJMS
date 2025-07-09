@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sleep 30 
+
 # Run migrations
 php artisan migrate --force
 
