@@ -78,6 +78,16 @@
     </nav>
 </aside>
 
+<!-- Mobile Menu Button -->
+<button id="mobileMenuButton" class="fixed top-4 left-4 z-50 p-2 rounded-md text-gray-700 bg-white shadow-lg md:hidden">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+    </svg>
+</button>
+
+<!-- Overlay for mobile -->
+<div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden"></div>
+
 <!-- Forgot Time In/Out Request Modal -->
 <div id="forgotTimeModal" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 9999;">
     <!-- Modal Backdrop -->
@@ -329,5 +339,51 @@
     document.addEventListener('DOMContentLoaded', () => {
         setupDragDrop('drag-drop-container-forgot', 'fileInputForgot', 'drag-drop-text-forgot');
         setupDragDrop('drag-drop-container-manual', 'fileInputManual', 'drag-drop-text-manual');
+    });
+
+    // Mobile sidebar toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('sidebar');
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const closeSidebarButton = document.getElementById('closeSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        mobileMenuButton.addEventListener('click', openSidebar);
+        closeSidebarButton.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth < 768) { // md breakpoint
+                if (!sidebar.contains(event.target) && 
+                    !mobileMenuButton.contains(event.target) && 
+                    !sidebar.classList.contains('-translate-x-full')) {
+                    closeSidebar();
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) { // md breakpoint
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        });
     });
 </script>

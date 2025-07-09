@@ -1,0 +1,24 @@
+services:
+    # Backend
+    backend:
+        env_file: .env
+        image: rainycl0ud/tajms:latest
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - "${BACKEND_PORT}:8000"
+        depends_on:
+            - db
+
+    # SQL Database
+    db:
+        env_file: .env
+        image: mysql:oraclelinux9
+        environment:
+            - MYSQL_DATABASE=railway
+            - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+        volumes:
+            - ./data:/var/lib/mysql
+        ports:
+            - "${DB_PORT}:3306"

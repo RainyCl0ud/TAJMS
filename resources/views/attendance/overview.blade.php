@@ -1,4 +1,4 @@
-<div class="bg-green-200 p-4 sm:p-6 rounded-lg shadow-lg border border-gray-200 shadow-black shadow-lg w-full h-full">
+<div class="bg-gray-100 p-4 sm:p-6 rounded-lg shadow-lg border border-gray-200 shadow-black shadow-lg w-full h-full">
     <div class="flex md:justify-between items-start mb-4">
         {{-- Heading with responsive text size --}}
         <h2 class="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 sm:mb-0">

@@ -2,6 +2,12 @@
 @include('components.header')
 
 @section('content')
+
+<!-- <style> 
+.bg-blue-50 {
+    
+}
+</style> -->
 <div class="overflow-y-auto max-h-[100vh] sm:max-h-screen px-2 sm:px-4 flex-wrap bg-blue-100 min-h-screen">
 
     <!-- Flash Messages -->
@@ -31,7 +37,7 @@
                         </div>
                         <div class="flex flex-col space-y-4">
                             <button id="startCameraButton" 
-                            class="bg-green-500 text-white py-2 px-4 md:px-6 rounded-lg shadow hover:bg-green-600 transition w-full sm:w-auto text-sm md:text-base min-w-[120px]">
+                            class="bg-blue-100 text-black py-2 px-4 md:px-6 rounded-lg shadow-lg shadow-black hover:bg-green-600 transition w-full sm:w-auto text-sm md:text-base min-w-[120px]">
                             Start Camera
                             </button>
                             <form id="attendanceForm" action="{{ route('attendance.mark') }}" method="POST" style="display: none;">
