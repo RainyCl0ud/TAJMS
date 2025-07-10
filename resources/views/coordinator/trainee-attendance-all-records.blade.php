@@ -8,7 +8,7 @@
         <div class="w-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
             <!-- Header -->
             <div class="bg-blue-600 text-white text-center py-4 text-lg font-semibold">
-                Forgot Time In/Out Requests
+                Today's Attendance
             </div>
             <!-- Table Wrapper -->
             <div class="overflow-x-auto table-container">
