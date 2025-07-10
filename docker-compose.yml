@@ -2,15 +2,14 @@ services:
     # Backend
     backend:
         env_file: .env
-        image: rainycl0ud/tajms:latest
         build:
             context: .
             dockerfile: Dockerfile
         ports:
             - "${BACKEND_PORT}:8000"
         depends_on:
-          db:
-            condition: service_healthy
+            db:
+                condition: service_healthy
 
     # SQL Database
     db:
@@ -24,7 +23,7 @@ services:
         ports:
             - "${DB_PORT}:3306"
         healthcheck:
-          test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-          interval: 10s
-          timeout: 5s
-          retries: 5
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
