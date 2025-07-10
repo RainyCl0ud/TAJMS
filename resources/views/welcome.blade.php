@@ -58,6 +58,7 @@
         <footer class="mt-12 text-gray-600 text-xs sm:text-sm animate-fadeIn delay-300">
             ©{{ date('Y') }} <span class="text-blue-800 font-semibold">TAJMS</span>. All rights reserved.
         <p>Developed by: Rainheart Galario</p>
+        <p>Text Test</p>
         </footer>
     </div>
 
