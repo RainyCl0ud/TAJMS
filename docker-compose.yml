@@ -1,12 +1,12 @@
 services:
     # Backend
-    backend:
+    app:
         env_file: .env
         build:
             context: .
             dockerfile: Dockerfile
         ports:
-            - "${BACKEND_PORT}:8000"
+            - "${APP_PORT}:8000"
         depends_on:
             db:
                 condition: service_healthy
