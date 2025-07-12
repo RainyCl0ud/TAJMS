@@ -30,7 +30,7 @@
         </h1>
         
         <p class="mt-4 text-gray-700 text-base sm:text-lg md:text-xl leading-relaxed animate-slideIn">
-            <span class="text-blue-800 font-semibold">TAJMS</span> (Trainees Attendance & Journal Monitoring System) helps you manage work schedules, track attendance, and streamline your workflow efficiently.
+            <span class="text-blue-800 font-semibold">TAJMS</span> simplifies OJT management for students and coordinators — from attendance tracking to journal monitoring — with ready-to-print journal entries and attendance sheets for complete OJT documentation, all in one seamless platform.
         </p>
 
         <!-- Authentication Buttons -->
@@ -56,9 +56,11 @@
 
         <!-- Footer -->
         <footer class="mt-12 text-gray-600 text-xs sm:text-sm animate-fadeIn delay-300">
+           
+            <p>Developed by: Rainheart Galario</p>
+             
             ©{{ date('Y') }} <span class="text-blue-800 font-semibold">TAJMS</span>. All rights reserved.
-        <p>Developed by: Rainheart Galario</p>
-        <p>Text Test</p>
+        
         </footer>
     </div>
 
